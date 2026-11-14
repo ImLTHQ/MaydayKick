@@ -8,6 +8,8 @@
 
 不修改游戏本体的任何文件，插件就是一个 dll，删掉即可完全还原。
 
+> **参考模组**：本插件的界面布局与打包方式参考了 CHmadoka 的 [MaydayUnlock](https://www.nexusmods.com/maydayairways/mods/1)（[源码](https://github.com/CHmadoka/more_players)），它把联机人数上限从 4 提到 16。两者改的是游戏的不同部分，可以一起安装。
+
 ---
 
 ## 功能

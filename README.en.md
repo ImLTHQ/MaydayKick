@@ -8,6 +8,8 @@ Host-side management for *Mayday Airways* lobbies: **kick players, blacklist the
 
 Nothing in the game itself is modified. The mod is a single DLL — delete it and everything is back to stock.
 
+> **Reference mod**: the UI layout and packaging here are modeled after [MaydayUnlock](https://www.nexusmods.com/maydayairways/mods/1) by CHmadoka ([source](https://github.com/CHmadoka/more_players)), which raises the co-op player limit from 4 to 16. They touch different parts of the game, so both can be installed side by side.
+
 ---
 
 ## Features
