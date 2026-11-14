@@ -1,0 +1,11 @@
+# 构建产物
+bin/
+obj/
+
+# IDE
+.vs/
+*.user
+*.suo
+
+# 本地发布包
+*-v*.zip
