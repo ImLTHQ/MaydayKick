@@ -10,6 +10,8 @@ namespace MaydayKick
     // 浏览器读的是同一条数据。所以在创建成功之后直接覆盖它就行。
     internal static class RoomName
     {
+        private const string MinimumLevelSuffixPrefix = " | 下限Steam公开Lv";
+
         public static void TryApply(SteamLobbyService steam)
         {
             if (steam == null) return;
@@ -25,11 +27,23 @@ namespace MaydayKick
                 var current = SteamMatchmaking.GetLobbyData(lobby, key);
                 Plugin.Logger.LogInfo($"[MaydayKick] lobby data: {SteamLobbyService.KeyGame}='{SteamMatchmaking.GetLobbyData(lobby, SteamLobbyService.KeyGame)}' {SteamLobbyService.KeyVersion}='{SteamMatchmaking.GetLobbyData(lobby, SteamLobbyService.KeyVersion)}' {SteamLobbyService.KeyHost}='{SteamMatchmaking.GetLobbyData(lobby, SteamLobbyService.KeyHost)}' {key}='{current}'");
 
-                var wanted = Plugin.RoomName.Value;
+                var configuredName = Plugin.RoomName.Value;
+                var wanted = string.IsNullOrWhiteSpace(configuredName) ? current : configuredName;
+                wanted = RemoveGeneratedSuffix(wanted);
                 if (string.IsNullOrWhiteSpace(wanted)) return;
 
                 wanted = wanted.Replace("{host}", SafePersona());
-                if (wanted.Length > 63) wanted = wanted.Substring(0, 63);
+                var suffix = MinimumLevelSuffixPrefix + Math.Max(1, Plugin.SteamLevelMinimum.Value);
+                var maxBaseLength = 63 - suffix.Length;
+                if (wanted.Length > maxBaseLength)
+                {
+                    if (maxBaseLength > 0 && char.IsHighSurrogate(wanted[maxBaseLength - 1]) &&
+                        char.IsLowSurrogate(wanted[maxBaseLength]))
+                        maxBaseLength--;
+
+                    wanted = wanted.Substring(0, maxBaseLength);
+                }
+                wanted += suffix;
                 if (wanted == current) return;
 
                 var ok = SteamMatchmaking.SetLobbyData(lobby, key, wanted);
@@ -39,6 +53,23 @@ namespace MaydayKick
             {
                 Plugin.Logger.LogWarning("[MaydayKick] room name failed: " + e.Message);
             }
+        }
+
+        public static string RemoveGeneratedSuffix(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return name;
+
+            var suffixIndex = name.LastIndexOf(MinimumLevelSuffixPrefix, StringComparison.Ordinal);
+            if (suffixIndex < 0) return name;
+
+            var level = name.Substring(suffixIndex + MinimumLevelSuffixPrefix.Length);
+            if (level.Length == 0) return name;
+            for (var i = 0; i < level.Length; i++)
+            {
+                if (level[i] < '0' || level[i] > '9') return name;
+            }
+
+            return name.Substring(0, suffixIndex);
         }
 
         private static string SafePersona()
@@ -102,7 +133,6 @@ namespace MaydayKick
                 if (now < next) return;
                 next = now + 2f;
 
-                if (string.IsNullOrWhiteSpace(Plugin.RoomName.Value)) return;
                 if (Plugin.Instance != null) Plugin.Instance.Config.Reload();
                 RoomName.TryApply(__instance.steam);
             }

@@ -4,7 +4,7 @@
 
 **[English README → README.en.md](README.en.md)**
 
-给《Mayday Airways》Demo 的联机房主加一点管理手段：**踢人、黑名单、机组列表滚动、自定义房间名、机组列表显示玩家名**。
+给《Mayday Airways》Demo 的联机房主加一点管理手段：**踢人、黑名单、按 Steam 等级下限筛选玩家、拦截纯数字昵称、机组列表滚动、自定义房间名、机组列表显示玩家名**。
 
 不修改游戏本体的任何文件，插件就是一个 dll，删掉即可完全还原。
 
@@ -18,6 +18,7 @@
 | --- | --- | --- |
 | 踢出玩家 | 机长菜单「机组」列表每行右侧多一个红色按钮，点了把人踢出本局 | 仅房主 |
 | 踢出并拉黑 | 每行右侧的锁形按钮，踢人同时把对方 SteamID 写进黑名单，之后他再来会被挡在认证阶段 | 仅房主 |
+| 玩家条件拦截 | 后台检查 Steam 等级是否达到配置下限，并分别检查纯数字 Steam 昵称、纯数字游戏昵称；Steam 等级支持单独记录或踢出 | 仅房主 |
 | 机组列表滚动 | 人数超过一屏时可以滚动查看，不会再有看不到的最后几行 | 所有人 |
 | 显示玩家名 | 「值班中 / 驾驶中 / 出局」后面直接接上玩家名 | 所有人 |
 | 自定义房间名 | 房主可以在机长菜单里直接改大厅名字，也可以改配置文件 | 仅房主 |
@@ -77,12 +78,18 @@ BepInEx\config\MaydayKick\blacklist.txt
 
 不想手动编辑文件的话，主界面 Discord 按钮下面有个**「黑名单」按钮**，点开就是管理面板：每条显示备注名和 SteamID，右侧「移除」一点就解封，不用重启游戏，也不用去改 txt。条目多了可以在面板里直接滚动。
 
+### 玩家条件拦截
+
+Steam 等级通过异步访问 Steam 社区公开资料页 `https://steamcommunity.com/profiles/{SteamID64}` 查询，不要求玩家是房主好友。玩家先正常进入游戏，随后进入后台查询队列；`SteamLevelQueryConcurrency` 配置同时查询数，默认 5，范围 1-32。`SteamLevelMinimum` 设置 Steam 等级最低要求，默认 1，最小为 1；查询到的等级低于此值（包括 0 级）时视为不合格。仅当页面包含 `profile_private_info` 标记时识别为私密资料；公开页缺少等级标记也属于已识别的资料结果，不是查询意外，`KickZeroSteamLevel` 开启时会按等级资格规则处理。只有超时、请求失败或其他无法完成查询的错误由 `KickOnSteamLevelLookupFailure` 控制是否断开（默认关闭，即保留玩家）。`LogSteamLevel` 独立控制是否打印查询信息和失败原因。查询结果缓存 10 分钟，失败结果缓存 1 分钟。Steam 昵称、游戏昵称数字检查仍分别由 `BlockNumericSteamName`、`BlockNumericInGameName` 控制，昵称首尾空格不影响数字判断。
+
 ### 房间名
 
 两种方式，任选：
 
 - 机长菜单左边的输入框，改完回车立即生效
 - 配置文件 `BepInEx\config\local.mayday.kick.cfg` 里的 `[Room] Name`，支持 `{host}` 占位符（会替换成房主的 Steam 昵称），改完几秒内自动同步
+
+大厅名会自动追加 ` | 下限Steam公开Lv<等级>`，等级取 `SteamLevelMinimum`（最低按 1 处理）；房间名总长度遵守 Steam 的 63 字符限制。
 
 ---
 
@@ -97,6 +104,43 @@ BepInEx\config\MaydayKick\blacklist.txt
 # Setting type: String
 # Default value:
 Name =
+
+[Moderation]
+
+## 打印 Steam 等级查询结果，不会踢人。
+# Setting type: Boolean
+# Default value: true
+LogSteamLevel = true
+
+## 查询后踢出等级不合格的玩家（玩家先进场）；查询失败由 KickOnSteamLevelLookupFailure 控制。
+# Setting type: Boolean
+# Default value: false
+KickZeroSteamLevel = false
+
+## Steam 等级查询超时、请求失败或发生意外错误时是否踢出玩家；false 时保留玩家。
+# Setting type: Boolean
+# Default value: false
+KickOnSteamLevelLookupFailure = false
+
+## Steam 等级最低要求；低于此等级的玩家在踢出开关开启时会被踢出（最小值 1）。
+# Setting type: Int32
+# Default value: 1
+SteamLevelMinimum = 1
+
+## Steam 等级公开资料查询最大并发数（范围 1-32）。
+# Setting type: Int32
+# Default value: 5
+SteamLevelQueryConcurrency = 5
+
+## 拒绝 Steam 昵称仅由数字组成的玩家。
+# Setting type: Boolean
+# Default value: true
+BlockNumericSteamName = true
+
+## 拒绝游戏内昵称仅由数字组成的玩家。
+# Setting type: Boolean
+# Default value: true
+BlockNumericInGameName = true
 ```
 
 ---
@@ -112,7 +156,7 @@ BepInEx 6.0.0-be.793 - MaydayAirways
 看到 `BepInEx` 字样就说明加载器生效了。再打开 `BepInEx\LogOutput.log`，正常应该有：
 
 ```
-[MaydayKick] loaded v1.0.0 (kick + blacklist + crew scroll + room name)
+[MaydayKick] loaded v1.0.0 (kick + blacklist + queued Steam checks + player filters + crew scroll + room name)
 ```
 
 ---

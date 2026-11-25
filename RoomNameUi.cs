@@ -92,7 +92,8 @@ namespace MaydayKick
             {
                 var steam = Steam;
                 if (steam == null || !steam.InLobby) return "";
-                return SteamMatchmaking.GetLobbyData(steam.Lobby, SteamLobbyService.KeyName);
+                return RoomName.RemoveGeneratedSuffix(
+                    SteamMatchmaking.GetLobbyData(steam.Lobby, SteamLobbyService.KeyName));
             }
             catch
             {
@@ -108,14 +109,11 @@ namespace MaydayKick
                 if (steam == null || !steam.InLobby || !steam.IsOwner) return;
 
                 value = value == null ? "" : value.Trim();
+                value = RoomName.RemoveGeneratedSuffix(value);
                 if (value.Length == 0) return;
-                if (value.Length > 63) value = value.Substring(0, 63);
 
-                var ok = SteamMatchmaking.SetLobbyData(steam.Lobby, SteamLobbyService.KeyName, value);
-                Plugin.Logger.LogInfo($"[MaydayKick] room name set by ui -> '{value}' ok={ok}");
-
-                // 顺手记进配置，免得下次建房又变回去
                 Plugin.RoomName.Value = value;
+                RoomName.TryApply(steam);
                 if (Plugin.Instance != null) Plugin.Instance.Config.Save();
             }
             catch (Exception e)

@@ -4,7 +4,7 @@
 
 *[中文说明 → README.md](README.md)*
 
-Host-side management for *Mayday Airways* lobbies: **kick players, blacklist them, scroll the crew list, show player names, set a custom lobby name**.
+Host-side management for *Mayday Airways* lobbies: **kick players, blacklist them, reject zero-level Steam accounts or numeric-only names, scroll the crew list, show player names, set a custom lobby name**.
 
 Nothing in the game itself is modified. The mod is a single DLL — delete it and everything is back to stock.
 
@@ -18,6 +18,7 @@ Nothing in the game itself is modified. The mod is a single DLL — delete it an
 | --- | --- | --- |
 | Kick player | A red button appears at the right of each crew row in the captain's menu; clicking it removes that player from the session | Host only |
 | Kick and blacklist | The lock button next to it kicks the player *and* writes their SteamID to the blacklist, so they get blocked during authentication next time | Host only |
+| Player filters | Independently checks zero Steam level, numeric-only Steam names, and numeric-only in-game names; Steam level can be logged or used to kick separately | Host only |
 | Crew list scrolling | When more than a screenful of players join, the list scrolls instead of cutting off the last rows | Everyone |
 | Player names | The player's name is appended after the "On duty / Flying / Out" status text | Everyone |
 | Custom lobby name | The host can rename the lobby from the captain's menu, or from the config file | Host only |
@@ -77,6 +78,10 @@ One entry per line: SteamID64, a tab, then a note for yourself:
 
 If you would rather not edit the file by hand, use the **Blacklist** button on the main menu (below the Discord button). Every entry shows its note and SteamID, and the Remove button unblocks it immediately.
 
+### Player filters
+
+Steam level is queried asynchronously from the public Steam Community profile at `https://steamcommunity.com/profiles/{SteamID64}`; the player does not need to be the host's friend. Players enter the game first and are then queued for background lookup. `SteamLevelQueryConcurrency` sets the maximum simultaneous requests (default 5, range 1-32). `SteamLevelMinimum` sets the minimum accepted Steam level (default 1, minimum 1); a profile level below it, including level 0, is unqualified. A profile is identified as private only when the page contains the `profile_private_info` marker. A missing level marker is also a recognized profile result, not a lookup failure; when enabled, `KickZeroSteamLevel` handles these according to the profile qualification rules. `KickOnSteamLevelLookupFailure` controls only timeouts, request failures, and other errors that prevent the lookup from completing (default false, so players are kept). `LogSteamLevel` independently controls logging query results and failure details. Results are cached for 10 minutes, failures for 1 minute. Numeric-only Steam and in-game names remain separately controlled by `BlockNumericSteamName` and `BlockNumericInGameName`; leading/trailing spaces do not affect those checks.
+
 ### Lobby name
 
 Two ways, either works:
@@ -90,6 +95,8 @@ Two ways, either works:
 
 `BepInEx\config\local.mayday.kick.cfg`
 
+Lobby names automatically append ` | 下限Steam公开Lv<level>`, using `SteamLevelMinimum` (minimum 1). The complete name is limited to Steam's 63-character maximum.
+
 ```ini
 [Room]
 
@@ -97,6 +104,43 @@ Two ways, either works:
 # Setting type: String
 # Default value:
 Name =
+
+[Moderation]
+
+## Log Steam level query results without kicking.
+# Setting type: Boolean
+# Default value: true
+LogSteamLevel = true
+
+## Kick unqualified profiles after players enter the game; failed lookups are controlled separately.
+# Setting type: Boolean
+# Default value: false
+KickZeroSteamLevel = false
+
+## Kick on Steam level lookup timeouts, request failures, or other unexpected errors; false keeps the player.
+# Setting type: Boolean
+# Default value: false
+KickOnSteamLevelLookupFailure = false
+
+## Minimum required Steam level; players below it are kicked when kicking is enabled (minimum 1).
+# Setting type: Int32
+# Default value: 1
+SteamLevelMinimum = 1
+
+## Maximum concurrent Steam profile requests (range 1-32).
+# Setting type: Int32
+# Default value: 5
+SteamLevelQueryConcurrency = 5
+
+## Reject players whose Steam name consists only of digits.
+# Setting type: Boolean
+# Default value: true
+BlockNumericSteamName = true
+
+## Reject players whose in-game name consists only of digits.
+# Setting type: Boolean
+# Default value: true
+BlockNumericInGameName = true
 ```
 
 ---
@@ -112,7 +156,7 @@ BepInEx 6.0.0-be.793 - MaydayAirways
 If you see `BepInEx` there, the loader is active. Then check `BepInEx\LogOutput.log` for:
 
 ```
-[MaydayKick] loaded v1.0.0 (kick + blacklist + crew scroll + room name)
+[MaydayKick] loaded v1.0.0 (kick + blacklist + queued Steam checks + player filters + crew scroll + room name)
 ```
 
 ---
