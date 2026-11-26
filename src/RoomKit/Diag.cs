@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MaydayKick
+namespace RoomKit
 {
     internal static class Diag
     {

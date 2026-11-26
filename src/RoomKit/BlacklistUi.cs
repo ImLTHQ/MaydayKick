@@ -7,7 +7,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MaydayKick
+namespace RoomKit
 {
     [HarmonyPatch(typeof(MainMenuScreen), "Build")]
     internal static class BlacklistUiPatch
@@ -44,22 +44,22 @@ namespace MaydayKick
             try
             {
                 if (screen == null) return;
-                Plugin.Logger.LogInfo("[MaydayKick] blui step1 screen ok");
+                Plugin.Logger.LogInfo("[RoomKit] blui step1 screen ok");
                 var host = screen.GetComponent<RectTransform>();
-                if (host == null) { Plugin.Logger.LogWarning("[MaydayKick] blui host null"); return; }
-                Plugin.Logger.LogInfo("[MaydayKick] blui step2 host=" + host.name + " size=" + host.rect.width + "x" + host.rect.height);
+                if (host == null) { Plugin.Logger.LogWarning("[RoomKit] blui host null"); return; }
+                Plugin.Logger.LogInfo("[RoomKit] blui step2 host=" + host.name + " size=" + host.rect.width + "x" + host.rect.height);
                 if (host.Find(RootName) != null) return;
 
                 var rt = UIF.Rect(RootName, host);
-                if (rt == null) { Plugin.Logger.LogWarning("[MaydayKick] blui rect null"); return; }
-                Plugin.Logger.LogInfo("[MaydayKick] blui step3 root ok");
+                if (rt == null) { Plugin.Logger.LogWarning("[RoomKit] blui rect null"); return; }
+                Plugin.Logger.LogInfo("[RoomKit] blui step3 root ok");
                 rt.anchorMin = Vector2.zero;
                 rt.anchorMax = Vector2.one;
                 rt.offsetMin = Vector2.zero;
                 rt.offsetMax = Vector2.zero;
                 UIF.IgnoreLayout(rt.gameObject);
                 root = rt.gameObject;
-                Plugin.Logger.LogInfo("[MaydayKick] blui step4 ignorelayout ok");
+                Plugin.Logger.LogInfo("[RoomKit] blui step4 ignorelayout ok");
 
                 // 先把面板搭起来（这是主功能），再单独建入口按钮，互不干扰
                 try
@@ -69,29 +69,29 @@ namespace MaydayKick
                 }
                 catch (Exception e)
                 {
-                    Plugin.Logger.LogWarning("[MaydayKick] blui overlay failed: " + e);
+                    Plugin.Logger.LogWarning("[RoomKit] blui overlay failed: " + e);
                 }
-                Plugin.Logger.LogInfo("[MaydayKick] blui step7 overlay done overlay=" + (overlay != null));
+                Plugin.Logger.LogInfo("[RoomKit] blui step7 overlay done overlay=" + (overlay != null));
 
                 // 打开按钮：左下角
                 try
                 {
                     var openAction = DelegateSupport.ConvertDelegate<Il2CppSystem.Action>(new System.Action(Open));
-                    Plugin.Logger.LogInfo("[MaydayKick] blui step5 delegate ok");
+                    Plugin.Logger.LogInfo("[RoomKit] blui step5 delegate ok");
                     var open = UIF.Button(rt, "MaydayBlOpen", "黑名单", openAction, ButtonStyle.Secondary, 220f, 64f, new Il2CppSystem.Nullable<GlyphId>(), 26f, 14f);
-                    Plugin.Logger.LogInfo("[MaydayKick] blui step6 button " + (open == null ? "null" : "ok"));
+                    Plugin.Logger.LogInfo("[RoomKit] blui step6 button " + (open == null ? "null" : "ok"));
                     if (open != null) PlaceOpenButton(rt, open.GetComponent<RectTransform>());
                 }
                 catch (Exception e)
                 {
-                    Plugin.Logger.LogWarning("[MaydayKick] blui button failed: " + e);
+                    Plugin.Logger.LogWarning("[RoomKit] blui button failed: " + e);
                 }
 
-                                Plugin.Logger.LogInfo("[MaydayKick] blui step9 attached");
+                                Plugin.Logger.LogInfo("[RoomKit] blui step9 attached");
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] blacklist ui failed: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] blacklist ui failed: " + e.Message);
             }
         }
 
@@ -112,7 +112,7 @@ namespace MaydayKick
 
             if (refBtn == null)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] blui diag no reference button, fallback bottom-left");
+                Plugin.Logger.LogWarning("[RoomKit] blui diag no reference button, fallback bottom-left");
                 orc.anchorMin = new Vector2(0f, 0f);
                 orc.anchorMax = new Vector2(0f, 0f);
                 orc.pivot = new Vector2(0f, 0f);
@@ -125,7 +125,7 @@ namespace MaydayKick
             if (parent == null) return;
             var parentRt = parent.TryCast<RectTransform>();
 
-            Plugin.Logger.LogInfo("[MaydayKick] blui diag refBtn '" + refBtn.name + "' rect=" + refBtn.rect.width + "x" + refBtn.rect.height
+            Plugin.Logger.LogInfo("[RoomKit] blui diag refBtn '" + refBtn.name + "' rect=" + refBtn.rect.width + "x" + refBtn.rect.height
                 + " anchor=" + refBtn.anchorMin + "/" + refBtn.anchorMax + " pivot=" + refBtn.pivot
                 + " anchoredPos=" + refBtn.anchoredPosition + " parent=" + parent.name
                 + " hasVLG=" + (parentRt != null && parentRt.GetComponent<VerticalLayoutGroup>() != null)
@@ -160,7 +160,7 @@ namespace MaydayKick
                     le.flexibleWidth = 0f;
                     le.flexibleHeight = 0f;
                 }
-                catch (Exception e) { Plugin.Logger.LogWarning("[MaydayKick] blui le failed: " + e.Message); }
+                catch (Exception e) { Plugin.Logger.LogWarning("[RoomKit] blui le failed: " + e.Message); }
 
                 // 游戏把 Discord 按钮绝对定位在「退出」正下方那一行，正好跟我们的按钮抢同一行。
                 // 在布局组里插一个空白占位，把我们的按钮顶到 Discord 下面一行去。
@@ -169,7 +169,7 @@ namespace MaydayKick
                 if (discord != null)
                 {
                     var dr = discord.rect;
-                    Plugin.Logger.LogInfo("[MaydayKick] blui diag discord rect=" + dr.width + "x" + dr.height + " pos=" + discord.anchoredPosition + " name=" + discord.name);
+                    Plugin.Logger.LogInfo("[RoomKit] blui diag discord rect=" + dr.width + "x" + dr.height + " pos=" + discord.anchoredPosition + " name=" + discord.name);
                     if (dr.height > 10f) spacerH = dr.height + 16f;
                 }
 
@@ -191,7 +191,7 @@ namespace MaydayKick
                         var simg = spacer.GetComponent<Image>();
                         if (simg != null) simg.enabled = false;
                     }
-                    catch (Exception e) { Plugin.Logger.LogWarning("[MaydayKick] blui spacer le failed: " + e.Message); }
+                    catch (Exception e) { Plugin.Logger.LogWarning("[RoomKit] blui spacer le failed: " + e.Message); }
                 }
             }
             else
@@ -212,7 +212,7 @@ namespace MaydayKick
 
             var oc = new Vector3[4];
             orc.GetWorldCorners(oc);
-            Plugin.Logger.LogInfo("[MaydayKick] blui diag placed: rect=" + orc.rect.width + "x" + orc.rect.height
+            Plugin.Logger.LogInfo("[RoomKit] blui diag placed: rect=" + orc.rect.width + "x" + orc.rect.height
                 + " sizeDelta=" + orc.sizeDelta + " anchoredPos=" + orc.anchoredPosition
                 + " worldBl=(" + oc[0].x + "," + oc[0].y + ") worldTr=(" + oc[2].x + "," + oc[2].y + ")"
                 + " hasGroup=" + hasGroup);
@@ -263,7 +263,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] blui find button failed: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] blui find button failed: " + e.Message);
             }
             return null;
         }
@@ -284,9 +284,9 @@ namespace MaydayKick
 
         private static void BuildOverlay(RectTransform host)
         {
-            Plugin.Logger.LogInfo("[MaydayKick] blui ov1 start");
+            Plugin.Logger.LogInfo("[RoomKit] blui ov1 start");
             var brt = MakePanel(host, "MaydayBlBackdrop", new Color(0.05f, 0.07f, 0.1f, 0.62f), true);
-            Plugin.Logger.LogInfo("[MaydayKick] blui ov2 backdrop " + (brt == null ? "null" : "ok"));
+            Plugin.Logger.LogInfo("[RoomKit] blui ov2 backdrop " + (brt == null ? "null" : "ok"));
             if (brt == null) return;
             brt.anchorMin = Vector2.zero;
             brt.anchorMax = Vector2.one;
@@ -338,10 +338,10 @@ namespace MaydayKick
                 }
             }
 
-            Plugin.Logger.LogInfo("[MaydayKick] blui ov3 title/count/close ok");
+            Plugin.Logger.LogInfo("[RoomKit] blui ov3 title/count/close ok");
             RectTransform listContent;
             var scroll = UIF.Scroll(prt, "BlScroll", out listContent, 8f, UIF.Pad(10));
-            Plugin.Logger.LogInfo("[MaydayKick] blui ov4 scroll " + (scroll == null ? "null" : "ok"));
+            Plugin.Logger.LogInfo("[RoomKit] blui ov4 scroll " + (scroll == null ? "null" : "ok"));
             if (scroll != null)
             {
                 var srt = scroll.GetComponent<RectTransform>();
@@ -368,9 +368,9 @@ namespace MaydayKick
                     // ScrollRect 的 scrollRange = 0 → 滚动条变成摆设、滚轮也滚不动。
                     // 这里直接拆掉它们，改用我们自己算的绝对高度。
                     var vlg = content.GetComponent<VerticalLayoutGroup>();
-                    if (vlg != null) { UnityEngine.Object.Destroy(vlg); Plugin.Logger.LogInfo("[MaydayKick] blui removed VerticalLayoutGroup on content"); }
+                    if (vlg != null) { UnityEngine.Object.Destroy(vlg); Plugin.Logger.LogInfo("[RoomKit] blui removed VerticalLayoutGroup on content"); }
                     var fitter = content.GetComponent<ContentSizeFitter>();
-                    if (fitter != null) { UnityEngine.Object.Destroy(fitter); Plugin.Logger.LogInfo("[MaydayKick] blui removed ContentSizeFitter on content"); }
+                    if (fitter != null) { UnityEngine.Object.Destroy(fitter); Plugin.Logger.LogInfo("[RoomKit] blui removed ContentSizeFitter on content"); }
 
                     content.anchorMin = new Vector2(0f, 1f);
                     content.anchorMax = new Vector2(1f, 1f);
@@ -380,7 +380,7 @@ namespace MaydayKick
                 }
 
                 var vp = scroll.viewport;
-                Plugin.Logger.LogInfo("[MaydayKick] blui scroll diag viewport=" + (vp == null ? "null" : vp.name + " " + vp.rect.width + "x" + vp.rect.height)
+                Plugin.Logger.LogInfo("[RoomKit] blui scroll diag viewport=" + (vp == null ? "null" : vp.name + " " + vp.rect.width + "x" + vp.rect.height)
                     + " content=" + (content == null ? "null" : content.rect.width + "x" + content.rect.height)
                     + " vbar=" + (scroll.verticalScrollbar == null ? "null" : scroll.verticalScrollbar.name));
             }
@@ -397,7 +397,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] blacklist open failed: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] blacklist open failed: " + e.Message);
             }
         }
 
@@ -430,7 +430,7 @@ namespace MaydayKick
                 if (countText != null)
                 {
                     countText.Set(list.Count == 0
-                        ? "当前没有拉黑任何人。被拉黑的人会以 SteamID 的形式存在 BepInEx\\config\\MaydayKick\\blacklist.txt"
+                        ? "当前没有拉黑任何人。被拉黑的人会以 SteamID 的形式存在 BepInEx\\config\\RoomKit\\blacklist.txt"
                         : "共 " + list.Count + " 条，点「移除」即可解封（立即生效，不用重启）");
                 }
 
@@ -491,12 +491,12 @@ namespace MaydayKick
                         try
                         {
                             Blacklist.Remove(targetId);
-                            Plugin.Logger.LogInfo("[MaydayKick] blacklist ui removed " + targetName + " (" + targetId + ")");
+                            Plugin.Logger.LogInfo("[RoomKit] blacklist ui removed " + targetName + " (" + targetId + ")");
                             Refresh();
                         }
                         catch (Exception e)
                         {
-                            Plugin.Logger.LogWarning("[MaydayKick] blacklist remove failed: " + e.Message);
+                            Plugin.Logger.LogWarning("[RoomKit] blacklist remove failed: " + e.Message);
                         }
                     }));
 
@@ -528,7 +528,7 @@ namespace MaydayKick
                     scrollRef.StopMovement();
                     scrollRef.verticalNormalizedPosition = 1f;
                     var vp2 = scrollRef.viewport;
-                    Plugin.Logger.LogInfo("[MaydayKick] blui scroll diag after refresh rows=" + list.Count
+                    Plugin.Logger.LogInfo("[RoomKit] blui scroll diag after refresh rows=" + list.Count
                         + " contentH=" + (content == null ? -1f : content.rect.height)
                         + " viewportH=" + (vp2 == null ? -1f : vp2.rect.height)
                         + " contentAnchors=" + content.anchorMin + "/" + content.anchorMax
@@ -538,7 +538,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] blacklist refresh failed: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] blacklist refresh failed: " + e.Message);
             }
         }
     }

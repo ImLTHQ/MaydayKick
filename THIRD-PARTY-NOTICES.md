@@ -1,6 +1,6 @@
 # 第三方组件声明
 
-本发布包（`MaydayKick-v1.0.0.zip`）里除了 `MaydayKick.dll` 之外，还带了运行它所需的第三方组件。
+本发布包（`RoomKit-v1.0.0.zip`）里除了 `RoomKit.dll` 之外，还带了运行它所需的第三方组件。
 这些组件的版权归各自作者所有，按各自的许可证分发，以下是清单。
 
 | 组件 | 版本 | 许可证 | 项目地址 |
@@ -19,4 +19,4 @@
 - **.NET 运行时采用 MIT 许可证**，版权归 .NET Foundation and Contributors 所有。
 - **本包不包含游戏本体、游戏资源或游戏程序集的任何文件。**
   游戏程序集（`Assembly-CSharp.dll`、`Mirror.dll` 等）仅在本机编译插件时被引用，不会被分发。
-- MaydayKick 自身的代码采用 MIT 许可证，见 `LICENSE`。
+- RoomKit 自身的代码采用 MIT 许可证，见 `LICENSE`。

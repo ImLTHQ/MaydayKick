@@ -2,7 +2,7 @@ using System;
 using HarmonyLib;
 using Mayday.UI;
 
-namespace MaydayKick
+namespace RoomKit
 {
     // 行对象会被 RebuildCrew 复用：只有新玩家进来时才调 MakeRow，
     // 已有行只是刷新文字。所以「加名字/加按钮」不能只挂在 MakeRow 上，
@@ -20,7 +20,7 @@ namespace MaydayKick
                 int count = rows.Count;
                 if (count == 0) return;
 
-                Plugin.Logger.LogInfo("[MaydayKick] rebuild hook rows=" + count);
+                Plugin.Logger.LogInfo("[RoomKit] rebuild hook rows=" + count);
                 for (int i = 0; i < count; i++)
                 {
                     var row = rows[i];
@@ -47,7 +47,7 @@ namespace MaydayKick
                             }
                         }
                     }
-                    catch (Exception e) { Plugin.Logger.LogWarning("[MaydayKick] row height: " + e.Message); }
+                    catch (Exception e) { Plugin.Logger.LogWarning("[RoomKit] row height: " + e.Message); }
                 }
 
                 // 行数变了以后让内容容器重新算高度，否则最后一行会被裁在视口外面
@@ -90,7 +90,7 @@ namespace MaydayKick
                                         + " local=" + (p != null && p.isLocalPlayer)
                                         + " conn=" + (p != null && p.connectionToClient != null ? p.connectionToClient.connectionId.ToString() : "-");
                                 }
-                                Plugin.Logger.LogInfo("[MaydayKick] rowdump:" + dump);
+                                Plugin.Logger.LogInfo("[RoomKit] rowdump:" + dump);
 
                                 string kids = "";
                                 for (int i = 0; i < content.childCount; i++)
@@ -101,9 +101,9 @@ namespace MaydayKick
                                         + " h=" + (crt != null ? crt.rect.height.ToString("F0") : "?")
                                         + " y=" + (crt != null ? crt.anchoredPosition.y.ToString("F0") : "?") + ">";
                                 }
-                                Plugin.Logger.LogInfo("[MaydayKick] contentkids:" + kids);
+                                Plugin.Logger.LogInfo("[RoomKit] contentkids:" + kids);
                             }
-                            catch (Exception e) { Plugin.Logger.LogWarning("[MaydayKick] rowdump failed: " + e.Message); }
+                            catch (Exception e) { Plugin.Logger.LogWarning("[RoomKit] rowdump failed: " + e.Message); }
                         }
 
                         if (Diag.Once("scrolltree"))
@@ -118,7 +118,7 @@ namespace MaydayKick
                                 if (cur == null) break;
                                 cur = cur.parent;
                             }
-                            Plugin.Logger.LogInfo("[MaydayKick] scrolltree: need=" + need.ToString("F0")
+                            Plugin.Logger.LogInfo("[RoomKit] scrolltree: need=" + need.ToString("F0")
                                 + " content=" + rt.rect.height.ToString("F0")
                                 + " viewport=" + (vp != null ? vp.rect.height.ToString("F0") : "null")
                                 + " anchoredPos=" + rt.anchoredPosition
@@ -126,11 +126,11 @@ namespace MaydayKick
                         }
                     }
                 }
-                catch (Exception e) { Plugin.Logger.LogWarning("[MaydayKick] content relayout: " + e.Message); }
+                catch (Exception e) { Plugin.Logger.LogWarning("[RoomKit] content relayout: " + e.Message); }
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] rebuild hook failed: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] rebuild hook failed: " + e.Message);
             }
         }
     }

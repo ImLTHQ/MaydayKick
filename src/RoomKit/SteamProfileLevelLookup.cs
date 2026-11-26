@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MaydayKick
+namespace RoomKit
 {
     internal enum SteamProfileLevelStatus
     {
@@ -83,7 +83,7 @@ namespace MaydayKick
             };
             var client = new HttpClient(handler);
             client.Timeout = TimeSpan.FromSeconds(8);
-            client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "MaydayKick/1.0");
+            client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "RoomKit/1.0");
             client.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Language", "en-US,en;q=0.8");
             return client;
         }
@@ -98,7 +98,7 @@ namespace MaydayKick
                     : Plugin.SteamLevelQueryConcurrency.Value;
                 var limit = Math.Max(1, Math.Min(32, configuredLimit));
                 if (configuredLimit != limit)
-                    Plugin.Logger.LogWarning("[MaydayKick] SteamLevelQueryConcurrency 超出范围，实际使用 " + limit);
+                    Plugin.Logger.LogWarning("[RoomKit] SteamLevelQueryConcurrency 超出范围，实际使用 " + limit);
 
                 while (activeRequests < limit && Queue.Count > 0)
                 {

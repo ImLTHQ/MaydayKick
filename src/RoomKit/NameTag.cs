@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MaydayKick
+namespace RoomKit
 {
     // 机组列表每行原本只有「值班中 / 驾驶中」这种状态字，没有人名。
     // 这里在状态字右边补一个名字，优先取 Steam 昵称，取不到就用游戏自己的 displayName。
@@ -50,7 +50,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] name tag failed: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] name tag failed: " + e.Message);
             }
         }
 
@@ -84,7 +84,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] persona lookup failed: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] persona lookup failed: " + e.Message);
             }
 
             try

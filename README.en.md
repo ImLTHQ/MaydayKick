@@ -1,4 +1,4 @@
-# Mayday Kick
+# RoomKit
 
 > **Developed with the assistance of 大肥鱼 (DeepSeek) and DSH.**
 
@@ -29,7 +29,7 @@ Nothing in the game itself is modified. The mod is a single DLL — delete it an
 
 ## Installation
 
-1. Download `MaydayKick-v1.0.0.zip`
+1. Download `RoomKit-v1.0.0.zip`
 2. Extract **everything** into the game root folder (the folder containing `MaydayAirways.exe`)
 3. Launch the game
 
@@ -39,7 +39,7 @@ On Steam: right-click the game → Manage → Browse local files to open the gam
 
 ### Already using BepInEx?
 
-Just drop `BepInEx/plugins/MaydayKick.dll` into your existing `BepInEx/plugins/`. You do not need to overwrite `BepInEx/core` or `dotnet`.
+Just drop `BepInEx/plugins/RoomKit.dll` into your existing `BepInEx/plugins/`. You do not need to overwrite `BepInEx/core` or `dotnet`.
 
 It coexists fine with other BepInEx 6 plugins.
 
@@ -63,7 +63,9 @@ The target player is resolved **at the moment you click**, not when the row was 
 The blacklist is a plain text file, created after the first launch:
 
 ```
-BepInEx\config\MaydayKick\blacklist.txt
+BepInEx\config\RoomKit\blacklist.txt
+
+When upgrading, move any existing files from `BepInEx\config\MaydayKick` to `BepInEx\config\RoomKit`.
 ```
 
 One entry per line: SteamID64, a tab, then a note for yourself:
@@ -84,7 +86,7 @@ If you would rather not edit the file by hand, use the **Blacklist** button on t
 As the host, use the check button on a crew row to add or remove that player. The **Whitelist** button near the Discord/Blacklist buttons on the main menu opens the list, where entries can also be removed. The file is:
 
 ```
-BepInEx\config\MaydayKick\whitelist.txt
+BepInEx\config\RoomKit\whitelist.txt
 ```
 
 Each line contains the SteamID64, a tab, the player's name, and an optional note preceded by another tab:
@@ -174,7 +176,7 @@ BepInEx 6.0.0-be.793 - MaydayAirways
 If you see `BepInEx` there, the loader is active. Then check `BepInEx\LogOutput.log` for:
 
 ```
-[MaydayKick] loaded v1.0.0 (kick + blacklist + whitelist + queued Steam checks + player filters + crew scroll + room name)
+[RoomKit] loaded v1.0.0 (kick + blacklist + whitelist + queued Steam checks + player filters + crew scroll + room name)
 ```
 
 ---
@@ -208,7 +210,7 @@ dotnet\
 BepInEx\
 ```
 
-To keep the loader but disable only this mod, delete `BepInEx\plugins\MaydayKick.dll`.
+To keep the loader but disable only this mod, delete `BepInEx\plugins\RoomKit.dll`.
 
 ---
 
@@ -216,13 +218,13 @@ To keep the loader but disable only this mod, delete `BepInEx\plugins\MaydayKick
 
 Requires .NET SDK 6.0 or newer.
 
-The C# source and project file for this mod live in `src/MaydayKick/`. Additional mods can use their own named directories under `src/` and build independently.
+The C# source and project file for this mod live in `src/RoomKit/`. Additional mods can use their own named directories under `src/` and build independently.
 
 ```
-dotnet build src\MaydayKick\MaydayKick.csproj -c Release
+dotnet build src\RoomKit\RoomKit.csproj -c Release
 ```
 
-The output lands in `src/MaydayKick/bin/Release/MaydayKick.dll`. The `GameDir` property in the project file points at your game folder and is used to reference BepInEx and the IL2CPP interop assemblies — adjust it to your own path.
+The output lands in `src/RoomKit/bin/Release/RoomKit.dll`. The `GameDir` property in the project file points at your game folder and is used to reference BepInEx and the IL2CPP interop assemblies — adjust it to your own path.
 
 ---
 

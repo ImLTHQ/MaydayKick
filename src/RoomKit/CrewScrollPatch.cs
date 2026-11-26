@@ -4,7 +4,7 @@ using Mayday.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MaydayKick
+namespace RoomKit
 {
     // 机组列表超过大约 8 行就会被卡片裁掉，后面的人连名字都看不到，因为原版
     // crewList 是个固定高度的容器，没有滚动。
@@ -45,7 +45,7 @@ namespace MaydayKick
                 if (rt != null && rt.rect.height < 100f)
                 {
                     rt.sizeDelta = new Vector2(rt.sizeDelta.x, 420f);
-                    Plugin.Logger.LogWarning("[MaydayKick] scroll too flat, forced height 420");
+                    Plugin.Logger.LogWarning("[RoomKit] scroll too flat, forced height 420");
                 }
 
                 var rowInfo = "";
@@ -62,14 +62,14 @@ namespace MaydayKick
                 }
 
                 Plugin.Logger.LogInfo(
-                    "[MaydayKick] scroll diag: scroll=" + (rt == null ? "null" : rt.rect.size.ToString())
+                    "[RoomKit] scroll diag: scroll=" + (rt == null ? "null" : rt.rect.size.ToString())
                     + " content=" + (crt == null ? "null" : crt.rect.size.ToString())
                     + " rows=" + (screen.rows == null ? -1 : screen.rows.Count)
                     + " children=" + (content == null ? -1 : content.childCount) + rowInfo);
             }
             catch (System.Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] scroll diag failed: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] scroll diag failed: " + e.Message);
             }
         }
         private static void Postfix(PauseScreen __instance)
@@ -82,7 +82,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogError("[MaydayKick] crew scroll wrap failed: " + e);
+                Plugin.Logger.LogError("[RoomKit] crew scroll wrap failed: " + e);
             }
         }
 
@@ -91,7 +91,7 @@ namespace MaydayKick
             var old = screen.crewList;
             if (old == null)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] crewList is null, skip scroll");
+                Plugin.Logger.LogWarning("[RoomKit] crewList is null, skip scroll");
                 return;
             }
 
@@ -103,7 +103,7 @@ namespace MaydayKick
 
             if (parent.Find("MaydayCrewScroll") != null)
             {
-                Plugin.Logger.LogInfo("[MaydayKick] crew scroll already present");
+                Plugin.Logger.LogInfo("[RoomKit] crew scroll already present");
                 return;
             }
 
@@ -114,20 +114,20 @@ namespace MaydayKick
             var pos = oldRt.anchoredPosition;
             var size = oldRt.sizeDelta;
 
-            Plugin.Logger.LogInfo($"[MaydayKick] crewList rect: anchor={aMin}/{aMax} pivot={pivot} pos={pos} size={size} parent={parent.name} children={old.childCount}");
+            Plugin.Logger.LogInfo($"[RoomKit] crewList rect: anchor={aMin}/{aMax} pivot={pivot} pos={pos} size={size} parent={parent.name} children={old.childCount}");
 
             RectTransform throwaway;
             var scroll = UIF.Scroll(parent, "MaydayCrewScroll", out throwaway, 8f, UIF.Pad(8));
             if (scroll == null)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] UIF.Scroll returned null");
+                Plugin.Logger.LogWarning("[RoomKit] UIF.Scroll returned null");
                 return;
             }
 
             var srt = scroll.GetComponent<RectTransform>();
             if (srt == null)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] scroll has no RectTransform");
+                Plugin.Logger.LogWarning("[RoomKit] scroll has no RectTransform");
                 return;
             }
 
@@ -175,13 +175,13 @@ namespace MaydayKick
             if (old.GetComponent<VerticalLayoutGroup>() == null)
             {
                 UIF.VLayout(old.gameObject, 8f, UIF.Pad(0), TextAnchor.UpperLeft, true, true, true, false);
-                Plugin.Logger.LogInfo("[MaydayKick] added VerticalLayoutGroup to crewList");
+                Plugin.Logger.LogInfo("[RoomKit] added VerticalLayoutGroup to crewList");
             }
 
             if (old.GetComponent<ContentSizeFitter>() == null)
             {
                 UIF.Fit(old.gameObject, false, true);
-                Plugin.Logger.LogInfo("[MaydayKick] added ContentSizeFitter to crewList");
+                Plugin.Logger.LogInfo("[RoomKit] added ContentSizeFitter to crewList");
             }
 
             try
@@ -191,12 +191,12 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] layout rebuild: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] layout rebuild: " + e.Message);
             }
 
             diagLeft = 4;
             DumpTree(srt, 0);
-            Plugin.Logger.LogInfo("[MaydayKick] crew list is now scrollable");
+            Plugin.Logger.LogInfo("[RoomKit] crew list is now scrollable");
         }
 
         private static void DumpTree(Transform t, int depth)
@@ -204,7 +204,7 @@ namespace MaydayKick
             if (depth > 3 || t == null) return;
             var rt = t.TryCast<RectTransform>();
             var extra = rt == null ? "" : $" size={rt.sizeDelta} anchor={rt.anchorMin}/{rt.anchorMax}";
-            Plugin.Logger.LogInfo(new string(' ', depth * 2) + "[MaydayKick] tree " + t.name + extra + " children=" + t.childCount);
+            Plugin.Logger.LogInfo(new string(' ', depth * 2) + "[RoomKit] tree " + t.name + extra + " children=" + t.childCount);
             for (int i = 0; i < t.childCount; i++)
             {
                 DumpTree(t.GetChild(i), depth + 1);

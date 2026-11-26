@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using BepInEx;
 
-namespace MaydayKick
+namespace RoomKit
 {
     internal sealed class WhitelistEntry
     {
@@ -29,7 +29,7 @@ namespace MaydayKick
             get
             {
                 if (path == null)
-                    path = Path.Combine(Paths.ConfigPath, "MaydayKick", "whitelist.txt");
+                    path = Path.Combine(Paths.ConfigPath, "RoomKit", "whitelist.txt");
                 return path;
             }
         }
@@ -50,11 +50,11 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] 创建白名单文件失败: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] 创建白名单文件失败: " + e.Message);
             }
 
             Reload(true);
-            Plugin.Logger.LogInfo("[MaydayKick] 白名单文件: " + FilePath + "，当前 " + Count + " 条");
+            Plugin.Logger.LogInfo("[RoomKit] 白名单文件: " + FilePath + "，当前 " + Count + " 条");
         }
 
         internal static bool Contains(ulong steamId)
@@ -71,7 +71,7 @@ namespace MaydayKick
 
             if (Blacklist.Contains(steamId) && !Blacklist.Remove(steamId))
             {
-                Plugin.Logger.LogWarning("[MaydayKick] 未能从黑名单移除 " + steamId + "，取消加入白名单");
+                Plugin.Logger.LogWarning("[RoomKit] 未能从黑名单移除 " + steamId + "，取消加入白名单");
                 return false;
             }
 
@@ -97,12 +97,12 @@ namespace MaydayKick
                 }
                 catch (Exception e)
                 {
-                    Plugin.Logger.LogWarning("[MaydayKick] 写入白名单失败: " + e.Message);
+                    Plugin.Logger.LogWarning("[RoomKit] 写入白名单失败: " + e.Message);
                     return false;
                 }
             }
 
-            Plugin.Logger.LogInfo("[MaydayKick] 已加入白名单 " + name + " (" + steamId + ")，共 " + Count + " 条");
+            Plugin.Logger.LogInfo("[RoomKit] 已加入白名单 " + name + " (" + steamId + ")，共 " + Count + " 条");
             return true;
         }
 
@@ -122,7 +122,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] 读取白名单列表失败: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] 读取白名单列表失败: " + e.Message);
             }
             return list;
         }
@@ -155,12 +155,12 @@ namespace MaydayKick
                 }
                 catch (Exception e)
                 {
-                    Plugin.Logger.LogWarning("[MaydayKick] 重写白名单失败: " + e.Message);
+                    Plugin.Logger.LogWarning("[RoomKit] 重写白名单失败: " + e.Message);
                     return false;
                 }
             }
 
-            Plugin.Logger.LogInfo("[MaydayKick] 已移出白名单 " + steamId + "，共 " + Count + " 条");
+            Plugin.Logger.LogInfo("[RoomKit] 已移出白名单 " + steamId + "，共 " + Count + " 条");
             return true;
         }
 
@@ -222,11 +222,11 @@ namespace MaydayKick
                     lastLength = info.Length;
                 }
 
-                Plugin.Logger.LogInfo("[MaydayKick] 白名单已重载，共 " + ids.Count + " 条");
+                Plugin.Logger.LogInfo("[RoomKit] 白名单已重载，共 " + ids.Count + " 条");
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] 读取白名单失败: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] 读取白名单失败: " + e.Message);
             }
         }
 

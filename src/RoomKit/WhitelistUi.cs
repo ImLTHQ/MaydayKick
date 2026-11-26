@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MaydayKick
+namespace RoomKit
 {
     internal static class WhitelistUi
     {
@@ -50,7 +50,7 @@ namespace MaydayKick
                     : null;
                 if (buttonParent == null)
                 {
-                    Plugin.Logger.LogWarning("[MaydayKick] blacklist menu button not found; cannot place whitelist button");
+                    Plugin.Logger.LogWarning("[RoomKit] blacklist menu button not found; cannot place whitelist button");
                     return;
                 }
 
@@ -71,7 +71,7 @@ namespace MaydayKick
                     new Il2CppSystem.Nullable<GlyphId>(), 26f, 14f);
                 if (open == null)
                 {
-                    Plugin.Logger.LogWarning("[MaydayKick] whitelist open button creation failed");
+                    Plugin.Logger.LogWarning("[RoomKit] whitelist open button creation failed");
                     return;
                 }
 
@@ -106,11 +106,11 @@ namespace MaydayKick
                     openRt.sizeDelta = blacklistRect.sizeDelta;
                 }
 
-                Plugin.Logger.LogInfo("[MaydayKick] main menu whitelist manager attached");
+                Plugin.Logger.LogInfo("[RoomKit] main menu whitelist manager attached");
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogError("[MaydayKick] whitelist ui build failed: " + e);
+                Plugin.Logger.LogError("[RoomKit] whitelist ui build failed: " + e);
             }
         }
 
@@ -242,7 +242,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] whitelist open failed: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] whitelist open failed: " + e.Message);
             }
         }
 
@@ -276,7 +276,7 @@ namespace MaydayKick
                 if (countText != null)
                 {
                     countText.Set(entries.Count == 0
-                        ? "当前没有白名单成员。文件：BepInEx\\config\\MaydayKick\\whitelist.txt"
+                        ? "当前没有白名单成员。文件：BepInEx\\config\\RoomKit\\whitelist.txt"
                         : "共 " + entries.Count + " 条；白名单成员不会被自动过滤或踢出");
                 }
 
@@ -338,7 +338,7 @@ namespace MaydayKick
                         new System.Action(delegate
                         {
                             if (Whitelist.Remove(targetId))
-                                Plugin.Logger.LogInfo("[MaydayKick] whitelist ui removed " + targetId);
+                                Plugin.Logger.LogInfo("[RoomKit] whitelist ui removed " + targetId);
                             Refresh();
                         }));
                     var remove = UIF.Button(row, "Remove", "移除", removeAction,
@@ -370,7 +370,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] whitelist refresh failed: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] whitelist refresh failed: " + e.Message);
             }
         }
     }

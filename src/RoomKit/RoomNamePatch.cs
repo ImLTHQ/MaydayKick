@@ -4,7 +4,7 @@ using Mayday.Net;
 using Steamworks;
 using UnityEngine;
 
-namespace MaydayKick
+namespace RoomKit
 {
     // 大厅名由房主写进 Steam 大厅数据里（键名是 SteamLobbyService.KeyName），
     // 浏览器读的是同一条数据。所以在创建成功之后直接覆盖它就行。
@@ -50,7 +50,7 @@ namespace MaydayKick
                     if (wanted != current)
                     {
                         var ok = SteamMatchmaking.SetLobbyData(lobby, key, wanted);
-                        Plugin.Logger.LogInfo($"[MaydayKick] room name -> '{wanted}' ok={ok}");
+                        Plugin.Logger.LogInfo($"[RoomKit] room name -> '{wanted}' ok={ok}");
                     }
                 }
 
@@ -58,7 +58,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] room name failed: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] room name failed: " + e.Message);
             }
         }
 
@@ -68,7 +68,7 @@ namespace MaydayKick
             var version = SteamMatchmaking.GetLobbyData(lobby, SteamLobbyService.KeyVersion);
             var host = SteamMatchmaking.GetLobbyData(lobby, SteamLobbyService.KeyHost);
             var name = SteamMatchmaking.GetLobbyData(lobby, nameKey);
-            var message = $"[MaydayKick] lobby data: {SteamLobbyService.KeyGame}='{game}' {SteamLobbyService.KeyVersion}='{version}' {SteamLobbyService.KeyHost}='{host}' {nameKey}='{name}'";
+            var message = $"[RoomKit] lobby data: {SteamLobbyService.KeyGame}='{game}' {SteamLobbyService.KeyVersion}='{version}' {SteamLobbyService.KeyHost}='{host}' {nameKey}='{name}'";
             var now = Time.realtimeSinceStartup;
 
             if (lobby.m_SteamID != lastLobbyDataLobbyId ||
@@ -124,7 +124,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogError("[MaydayKick] room name patch: " + e);
+                Plugin.Logger.LogError("[RoomKit] room name patch: " + e);
             }
         }
     }
@@ -142,7 +142,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] room name fallback: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] room name fallback: " + e.Message);
             }
         }
     }
@@ -165,7 +165,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogDebug("[MaydayKick] room name sync: " + e.Message);
+                Plugin.Logger.LogDebug("[RoomKit] room name sync: " + e.Message);
             }
         }
     }

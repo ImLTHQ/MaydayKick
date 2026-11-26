@@ -4,7 +4,7 @@ using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 
-namespace MaydayKick
+namespace RoomKit
 {
     [BepInPlugin(Guid, "Mayday Kick", "1.0.0")]
     public class Plugin : BasePlugin
@@ -88,7 +88,7 @@ namespace MaydayKick
             Harmony.CreateAndPatchAll(typeof(RoomNameOnLobbyCreatedPatch), Guid);
             Harmony.CreateAndPatchAll(typeof(RoomNameOnSessionPatch), Guid);
             Harmony.CreateAndPatchAll(typeof(RoomNameSyncPatch), Guid);
-            Logger.LogInfo("[MaydayKick] loaded v1.0.0 (kick + blacklist + whitelist + queued Steam checks + player filters + crew scroll + room name)");
+            Logger.LogInfo("[RoomKit] loaded v1.0.0 (kick + blacklist + whitelist + queued Steam checks + player filters + crew scroll + room name)");
         }
     }
 }

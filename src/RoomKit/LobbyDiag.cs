@@ -6,7 +6,7 @@ using Mayday.UI;
 using Steamworks;
 using UnityEngine;
 
-namespace MaydayKick
+namespace RoomKit
 {
     // Steam 大厅没有"房主移除成员"的 API：ISteamMatchmaking 里只有 LeaveLobby（自己退）、
     // SetLobbyJoinable、SetLobbyMemberLimit 等，没有 kick。
@@ -31,14 +31,14 @@ namespace MaydayKick
                 var session = NetSession.Instance;
                 if (session == null)
                 {
-                    Plugin.Logger.LogInfo("[MaydayKick] lobby(" + tag + "): no NetSession");
+                    Plugin.Logger.LogInfo("[RoomKit] lobby(" + tag + "): no NetSession");
                     return;
                 }
 
                 var steam = session.steam;
                 if (steam == null || !steam.InLobby)
                 {
-                    Plugin.Logger.LogInfo("[MaydayKick] lobby(" + tag + "): not in lobby");
+                    Plugin.Logger.LogInfo("[RoomKit] lobby(" + tag + "): not in lobby");
                     return;
                 }
 
@@ -54,11 +54,11 @@ namespace MaydayKick
                 }
 
                 var tail = watchSteamId == 0 ? "" : (found ? " target=IN-LOBBY" : " target=GONE");
-                Plugin.Logger.LogInfo($"[MaydayKick] lobby({tag}): owner={steam.IsOwner} members={n}{tail} [{sb.ToString().Trim()}]");
+                Plugin.Logger.LogInfo($"[RoomKit] lobby({tag}): owner={steam.IsOwner} members={n}{tail} [{sb.ToString().Trim()}]");
             }
             catch (System.Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] lobby snapshot failed: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] lobby snapshot failed: " + e.Message);
             }
         }
 
@@ -95,7 +95,7 @@ namespace MaydayKick
             }
             catch (System.Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] lobby tick failed: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] lobby tick failed: " + e.Message);
             }
         }
     }
@@ -108,11 +108,11 @@ namespace MaydayKick
             try
             {
                 var change = (EChatMemberStateChange)e.m_rgfChatMemberStateChange;
-                Plugin.Logger.LogInfo($"[MaydayKick] lobby chat update: user={e.m_ulSteamIDUserChanged} by={e.m_ulSteamIDMakingChange} change={change}");
+                Plugin.Logger.LogInfo($"[RoomKit] lobby chat update: user={e.m_ulSteamIDUserChanged} by={e.m_ulSteamIDMakingChange} change={change}");
             }
             catch (System.Exception ex)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] chat update log failed: " + ex.Message);
+                Plugin.Logger.LogWarning("[RoomKit] chat update log failed: " + ex.Message);
             }
         }
     }

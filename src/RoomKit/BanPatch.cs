@@ -6,7 +6,7 @@ using Mayday.Net;
 using Mirror;
 using Steamworks;
 
-namespace MaydayKick
+namespace RoomKit
 {
     /// <summary>
     /// 在认证阶段拦截数字昵称和黑名单；Steam 等级查询在认证通过后异步执行。
@@ -39,27 +39,27 @@ namespace MaydayKick
                 var steamId = msg.steamId;
                 if (Whitelist.Contains(steamId))
                 {
-                    Plugin.Logger.LogInfo("[MaydayKick] [白名单] 放行 " + msg.name + " - SteamID64 (" + steamId + ")");
+                    Plugin.Logger.LogInfo("[RoomKit] [白名单] - " + msg.name + " - SteamID64 (" + steamId + ")");
                     return true;
                 }
 
                 if (Plugin.BlockNumericInGameName.Value && IsNumericName(msg.name))
                 {
-                    Plugin.Logger.LogInfo("[MaydayKick] [拒绝] - 纯数字游戏昵称 " + msg.name + " - SteamID64 (" + steamId + ")");
+                    Plugin.Logger.LogInfo("[RoomKit] [阻止] - 纯数字游戏昵称 " + msg.name + " - SteamID64 (" + steamId + ")");
                     Reject(__instance, conn);
                     return false;
                 }
 
                 if (Plugin.BlockNumericSteamName.Value && IsNumericSteamName(steamId))
                 {
-                    Plugin.Logger.LogInfo("[MaydayKick] [拒绝] - 纯数字 Steam 昵称 SteamID64 (" + steamId + ")");
+                    Plugin.Logger.LogInfo("[RoomKit] [阻止] - 纯数字 Steam 昵称 SteamID64 (" + steamId + ")");
                     Reject(__instance, conn);
                     return false;
                 }
 
                 if (Blacklist.Contains(steamId))
                 {
-                    Plugin.Logger.LogInfo("[MaydayKick] [黑名单] - " + msg.name + " - SteamID64 (" + steamId + ")");
+                    Plugin.Logger.LogInfo("[RoomKit] [阻止] [黑名单] - " + msg.name + " - SteamID64 (" + steamId + ")");
                     Reject(__instance, conn);
                     return false;
                 }
@@ -80,7 +80,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogError("[MaydayKick] 认证阶段拦截出错: " + e);
+                Plugin.Logger.LogError("[RoomKit] 认证阶段拦截出错: " + e);
                 return true;
             }
         }
@@ -111,7 +111,7 @@ namespace MaydayKick
 
             if (!MainThreadActionRunner.Enqueue(() => CompleteLevelQuery(result)))
             {
-                Plugin.Logger.LogError("[MaydayKick] 主线程任务队列未初始化，无法处理 Steam 等级结果：" +
+                Plugin.Logger.LogError("[RoomKit] 主线程任务队列未初始化，无法处理 Steam 等级结果：" +
                     query.SteamId);
             }
         }
@@ -121,7 +121,7 @@ namespace MaydayKick
             var query = state.Query;
             if (Whitelist.Contains(query.SteamId))
             {
-                Plugin.Logger.LogInfo("[MaydayKick] [白名单] 保留 " + query.Name +
+                Plugin.Logger.LogInfo("[RoomKit] [白名单] 保留 " + query.Name +
                     " - SteamID64 (" + query.SteamId + ")");
                 return;
             }
@@ -151,7 +151,7 @@ namespace MaydayKick
             {
                 if (Plugin.KickZeroSteamLevel.Value && lookupFailed &&
                     !Plugin.KickOnSteamLevelLookupFailure.Value)
-                    Plugin.Logger.LogInfo("[MaydayKick] [等级] [放行] Steam 等级查询失败，按配置不踢出 " +
+                    Plugin.Logger.LogInfo("[RoomKit] [放行] Steam 等级查询失败，按配置不踢出 " +
                         query.Name + " - SteamID64 (" + query.SteamId + ")");
 
                 return;
@@ -164,7 +164,7 @@ namespace MaydayKick
                     : state.Result.Status == SteamProfileLevelStatus.Unavailable
                         ? "Steam 等级查询失败或超时"
                         : "Steam 等级 " + state.Result.Level + " 低于下限 " + minimumLevel;
-            Plugin.Logger.LogInfo("[MaydayKick] [等级] [拒绝] - " + reason + " " + query.Name +
+            Plugin.Logger.LogInfo("[RoomKit] [踢出] - " + reason + " " + query.Name +
                 " - SteamID64 (" + query.SteamId + ")");
 
             try
@@ -174,7 +174,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogError("[MaydayKick] Steam 等级不合格玩家断开失败 (" + query.SteamId + "): " + e);
+                Plugin.Logger.LogError("[RoomKit] Steam 等级不合格玩家断开失败 (" + query.SteamId + "): " + e);
             }
         }
 
@@ -182,22 +182,22 @@ namespace MaydayKick
         {
             if (result.Status == SteamProfileLevelStatus.Level)
             {
-                Plugin.Logger.LogInfo("[MaydayKick] [等级] " + query.Name + " - SteamID64 (" +
+                Plugin.Logger.LogInfo("[RoomKit] [查询] " + query.Name + " - SteamID64 (" +
                     query.SteamId + ") - Steam 等级: " + result.Level);
             }
             else if (result.Status == SteamProfileLevelStatus.Private)
             {
-                Plugin.Logger.LogInfo("[MaydayKick] [等级] " + query.Name + " - SteamID64 (" +
+                Plugin.Logger.LogInfo("[RoomKit] [查询] " + query.Name + " - SteamID64 (" +
                     query.SteamId + ") - Steam 资料为私密");
             }
             else if (result.Status == SteamProfileLevelStatus.Unqualified)
             {
-                Plugin.Logger.LogInfo("[MaydayKick] [等级] " + query.Name + " - SteamID64 (" +
+                Plugin.Logger.LogInfo("[RoomKit] [查询] " + query.Name + " - SteamID64 (" +
                     query.SteamId + ") - 公开资料没有等级标记");
             }
             else
             {
-                Plugin.Logger.LogWarning("[MaydayKick] [等级] 查询不可用 " + query.Name +
+                Plugin.Logger.LogWarning("[RoomKit] [查询] 不可用 " + query.Name +
                     " - SteamID64 (" + query.SteamId + ") - " + result.Detail);
             }
         }
@@ -218,7 +218,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] 读取 Steam 昵称失败 (" + steamId + "): " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] 读取 Steam 昵称失败 (" + steamId + "): " + e.Message);
                 return false;
             }
         }

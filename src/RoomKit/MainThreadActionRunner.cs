@@ -4,7 +4,7 @@ using System.Threading;
 using Il2CppInterop.Runtime.Injection;
 using UnityEngine;
 
-namespace MaydayKick
+namespace RoomKit
 {
     internal static class MainThreadActionRunner
     {
@@ -15,10 +15,10 @@ namespace MaydayKick
         {
             if (Volatile.Read(ref initialized)) return;
 
-            ClassInjector.RegisterTypeInIl2Cpp<MaydayKickMainThreadRunner>();
-            var gameObject = new GameObject("MaydayKick.MainThreadActionRunner");
+            ClassInjector.RegisterTypeInIl2Cpp<RoomKitMainThreadRunner>();
+            var gameObject = new GameObject("RoomKit.MainThreadActionRunner");
             UnityEngine.Object.DontDestroyOnLoad(gameObject);
-            gameObject.AddComponent<MaydayKickMainThreadRunner>();
+            gameObject.AddComponent<RoomKitMainThreadRunner>();
             Volatile.Write(ref initialized, true);
         }
 
@@ -40,15 +40,15 @@ namespace MaydayKick
                 }
                 catch (Exception e)
                 {
-                    Plugin.Logger.LogError("[MaydayKick] 主线程异步任务执行失败: " + e);
+                    Plugin.Logger.LogError("[RoomKit] 主线程异步任务执行失败: " + e);
                 }
             }
         }
     }
 
-    public sealed class MaydayKickMainThreadRunner : MonoBehaviour
+    public sealed class RoomKitMainThreadRunner : MonoBehaviour
     {
-        public MaydayKickMainThreadRunner(IntPtr pointer) : base(pointer) { }
+        public RoomKitMainThreadRunner(IntPtr pointer) : base(pointer) { }
 
         private void Update()
         {

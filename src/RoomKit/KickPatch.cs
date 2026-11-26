@@ -7,12 +7,12 @@ using Mirror;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MaydayKick
+namespace RoomKit
 {
     [HarmonyPatch(typeof(PauseScreen), "MakeRow")]
     internal static class KickPatch
     {
-        private const string KickBtn = "MaydayKickButton";
+        private const string KickBtn = "RoomKitButton";
         private const string BanBtn = "MaydayBanButton";
         private const string WhitelistBtn = "MaydayWhitelistButton";
 
@@ -26,7 +26,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogError("[MaydayKick] attach failed: " + e);
+                Plugin.Logger.LogError("[RoomKit] attach failed: " + e);
             }
         }
 
@@ -82,7 +82,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] row hook failed: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] row hook failed: " + e.Message);
             }
         }
 
@@ -98,7 +98,7 @@ namespace MaydayKick
                 string connTxt = "n/a", localTxt = "n/a";
                 try { connTxt = p.connectionToClient == null ? "null" : p.connectionToClient.connectionId.ToString(); } catch (Exception e) { connTxt = "err:" + e.Message; }
                 try { localTxt = LocalConnId().ToString(); } catch { }
-                Plugin.Logger.LogInfo("[MaydayKick] kickrow diag: display='" + p.DisplayName + "' isLocal=" + p.isLocalPlayer
+                Plugin.Logger.LogInfo("[RoomKit] kickrow diag: display='" + p.DisplayName + "' isLocal=" + p.isLocalPlayer
                     + " conn=" + connTxt + " local=" + localTxt + " serverActive=" + NetworkServer.active);
             }
 
@@ -135,7 +135,7 @@ namespace MaydayKick
             var banButton = tr.Find(BanBtn);
             if (banButton != null) banButton.gameObject.SetActive(!Whitelist.Contains(p.SteamId));
 
-            Plugin.Logger.LogInfo("[MaydayKick] buttons added for row of " + p.DisplayName + " layout=" + (hlg != null));
+            Plugin.Logger.LogInfo("[RoomKit] buttons added for row of " + p.DisplayName + " layout=" + (hlg != null));
         }
 
         private static void AddButton(Transform parent, string name, GlyphId glyph, ButtonStyle style, Il2CppSystem.Action onClick, HorizontalLayoutGroup hlg)
@@ -143,7 +143,7 @@ namespace MaydayKick
             var btn = UIF.IconButton(parent, name, glyph, onClick, style, 22f);
             if (btn == null)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] IconButton returned null for " + name);
+                Plugin.Logger.LogWarning("[RoomKit] IconButton returned null for " + name);
                 return;
             }
 
@@ -173,7 +173,7 @@ namespace MaydayKick
             {
                 if (row == null || row.player == null)
                 {
-                    Plugin.Logger.LogWarning("[MaydayKick] whitelist clicked but row/player is null");
+                    Plugin.Logger.LogWarning("[RoomKit] whitelist clicked but row/player is null");
                     return;
                 }
 
@@ -194,7 +194,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogError("[MaydayKick] whitelist toggle failed: " + e);
+                Plugin.Logger.LogError("[RoomKit] whitelist toggle failed: " + e);
             }
         }
 
@@ -205,27 +205,27 @@ namespace MaydayKick
                 // 点击这一刻才去问「这一行现在是谁」，不要用创建按钮时缓存的身份
                 if (row == null)
                 {
-                    Plugin.Logger.LogWarning("[MaydayKick] kick clicked but row is null");
+                    Plugin.Logger.LogWarning("[RoomKit] kick clicked but row is null");
                     return;
                 }
 
                 var p = row.player;
                 if (p == null)
                 {
-                    Plugin.Logger.LogWarning("[MaydayKick] kick clicked but row.player is null");
+                    Plugin.Logger.LogWarning("[RoomKit] kick clicked but row.player is null");
                     return;
                 }
 
                 if (IsHostSelf(p))
                 {
-                    Plugin.Logger.LogWarning("[MaydayKick] refuse to kick myself");
+                    Plugin.Logger.LogWarning("[RoomKit] refuse to kick myself");
                     return;
                 }
 
                 var conn = p.connectionToClient;
                 if (conn == null)
                 {
-                    Plugin.Logger.LogWarning("[MaydayKick] kick target has no connection: " + p.DisplayName);
+                    Plugin.Logger.LogWarning("[RoomKit] kick target has no connection: " + p.DisplayName);
                     return;
                 }
 
@@ -235,7 +235,7 @@ namespace MaydayKick
 
                 if (ban && Whitelist.Contains(steamId))
                 {
-                    Plugin.Logger.LogWarning("[MaydayKick] refuse to blacklist whitelisted player; remove whitelist first: " +
+                    Plugin.Logger.LogWarning("[RoomKit] refuse to blacklist whitelisted player; remove whitelist first: " +
                         displayName + " (" + steamId + ")");
                     return;
                 }
@@ -243,23 +243,23 @@ namespace MaydayKick
                 var local = LocalConnId();
                 if (local >= 0 && connId == local)
                 {
-                    Plugin.Logger.LogWarning("[MaydayKick] refuse to kick host's own connection " + connId);
+                    Plugin.Logger.LogWarning("[RoomKit] refuse to kick host's own connection " + connId);
                     return;
                 }
 
                 if (ban && Blacklist.Add(steamId, displayName))
                 {
-                    Plugin.Logger.LogInfo("[MaydayKick] banned " + displayName + " (" + steamId + ")");
+                    Plugin.Logger.LogInfo("[RoomKit] banned " + displayName + " (" + steamId + ")");
                 }
 
                 var live = FindConnection(connId);
                 if (live == null)
                 {
-                    Plugin.Logger.LogWarning("[MaydayKick] connection " + connId + " already gone");
+                    Plugin.Logger.LogWarning("[RoomKit] connection " + connId + " already gone");
                     return;
                 }
 
-                Plugin.Logger.LogInfo("[MaydayKick] kicking " + displayName + " (" + steamId + ") conn=" + connId + " ban=" + ban);
+                Plugin.Logger.LogInfo("[RoomKit] kicking " + displayName + " (" + steamId + ") conn=" + connId + " ban=" + ban);
                 LobbyDiag.Snapshot("before-kick");
                 live.Disconnect();
                 LobbyDiag.Schedule(steamId, 1.5f, "kick+1.5s");
@@ -267,7 +267,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogError("[MaydayKick] kick failed: " + e);
+                Plugin.Logger.LogError("[RoomKit] kick failed: " + e);
             }
         }
 
@@ -283,7 +283,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] connection lookup failed: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] connection lookup failed: " + e.Message);
             }
 
             return null;

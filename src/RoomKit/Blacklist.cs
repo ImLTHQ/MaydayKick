@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using BepInEx;
 
-namespace MaydayKick
+namespace RoomKit
 {
     /// <summary>
     /// 黑名单：存 steamId，一行一个，后面可以跟一个制表符和备注名。
@@ -23,7 +23,7 @@ namespace MaydayKick
             {
                 if (path == null)
                 {
-                    path = Path.Combine(Paths.ConfigPath, "MaydayKick", "blacklist.txt");
+                    path = Path.Combine(Paths.ConfigPath, "RoomKit", "blacklist.txt");
                 }
                 return path;
             }
@@ -37,7 +37,7 @@ namespace MaydayKick
         internal static void Init()
         {
             Reload(true);
-            Plugin.Logger.LogInfo("[MaydayKick] 黑名单文件: " + FilePath + "，当前 " + Count + " 条");
+            Plugin.Logger.LogInfo("[RoomKit] 黑名单文件: " + FilePath + "，当前 " + Count + " 条");
         }
 
         internal static bool Contains(ulong steamId)
@@ -57,7 +57,7 @@ namespace MaydayKick
                 Append(steamId, name);
             }
 
-            Plugin.Logger.LogInfo("[MaydayKick] 已拉黑 " + name + " (" + steamId + ")，共 " + Count + " 条");
+            Plugin.Logger.LogInfo("[RoomKit] 已拉黑 " + name + " (" + steamId + ")，共 " + Count + " 条");
             return true;
         }
 
@@ -85,7 +85,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] 读取黑名单列表失败: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] 读取黑名单列表失败: " + e.Message);
             }
             return list;
         }
@@ -118,12 +118,12 @@ namespace MaydayKick
                 }
                 catch (Exception e)
                 {
-                    Plugin.Logger.LogWarning("[MaydayKick] 重写黑名单失败: " + e.Message);
+                    Plugin.Logger.LogWarning("[RoomKit] 重写黑名单失败: " + e.Message);
                     return false;
                 }
             }
 
-            Plugin.Logger.LogInfo("[MaydayKick] 已解封 " + steamId + "，共 " + Count + " 条");
+            Plugin.Logger.LogInfo("[RoomKit] 已解封 " + steamId + "，共 " + Count + " 条");
             return true;
         }
 
@@ -137,7 +137,7 @@ namespace MaydayKick
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] 写入黑名单失败: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] 写入黑名单失败: " + e.Message);
             }
         }
 
@@ -173,11 +173,11 @@ namespace MaydayKick
                 }
 
                 lastWrite = info.LastWriteTimeUtc;
-                Plugin.Logger.LogInfo("[MaydayKick] 黑名单已重载，共 " + ids.Count + " 条");
+                Plugin.Logger.LogInfo("[RoomKit] 黑名单已重载，共 " + ids.Count + " 条");
             }
             catch (Exception e)
             {
-                Plugin.Logger.LogWarning("[MaydayKick] 读取黑名单失败: " + e.Message);
+                Plugin.Logger.LogWarning("[RoomKit] 读取黑名单失败: " + e.Message);
             }
         }
     }

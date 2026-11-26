@@ -1,4 +1,4 @@
-# Mayday Kick
+# RoomKit
 
 > **本模组由 大肥鱼（DeepSeek） 与 DSH 辅助开发完成。**
 
@@ -29,7 +29,7 @@
 
 ## 安装
 
-1. 下载 `MaydayKick-v1.0.0.zip`
+1. 下载 `RoomKit-v1.0.0.zip`
 2. 全部解压到**游戏根目录**（和 `MaydayAirways.exe` 同一层）
 3. 启动游戏
 
@@ -39,7 +39,7 @@ Steam 用户可以在库里右键游戏 → 管理 → 浏览本地文件，直�
 
 ### 已经装过其他 BepInEx 插件？
 
-直接把 `BepInEx\plugins\MaydayKick.dll` 放进现有的 `BepInEx\plugins\` 即可，不用覆盖 `BepInEx\core` 和 `dotnet`。
+直接把 `BepInEx\plugins\RoomKit.dll` 放进现有的 `BepInEx\plugins\` 即可，不用覆盖 `BepInEx\core` 和 `dotnet`。
 
 和 MaydayUnlock 这类同样基于 BepInEx 6 的插件**可以共存**，两者互不干涉。
 
@@ -63,7 +63,9 @@ Steam 用户可以在库里右键游戏 → 管理 → 浏览本地文件，直�
 黑名单是一个纯文本文件，第一次运行游戏后出现在：
 
 ```
-BepInEx\config\MaydayKick\blacklist.txt
+BepInEx\config\RoomKit\blacklist.txt
+
+升级时，如果旧版配置在 `BepInEx\config\MaydayKick`，请将其移动到 `BepInEx\config\RoomKit`。
 ```
 
 格式是一行一个，SteamID64 加一个 Tab，后面写备注（只给自己看）：
@@ -84,7 +86,7 @@ BepInEx\config\MaydayKick\blacklist.txt
 房主在机长菜单的机组成员行点击勾选按钮即可添加/移除玩家；主菜单 Discord/黑名单按钮附近的**「白名单」**按钮可以查看全部条目并移除。文件路径：
 
 ```
-BepInEx\config\MaydayKick\whitelist.txt
+BepInEx\config\RoomKit\whitelist.txt
 ```
 
 每行依次为 SteamID64、Tab、昵称、可选备注（备注前也用 Tab 分隔）：
@@ -174,7 +176,7 @@ BepInEx 6.0.0-be.793 - MaydayAirways
 看到 `BepInEx` 字样就说明加载器生效了。再打开 `BepInEx\LogOutput.log`，正常应该有：
 
 ```
-[MaydayKick] loaded v1.0.0 (kick + blacklist + whitelist + queued Steam checks + player filters + crew scroll + room name)
+[RoomKit] loaded v1.0.0 (kick + blacklist + whitelist + queued Steam checks + player filters + crew scroll + room name)
 ```
 
 ---
@@ -223,7 +225,7 @@ dotnet\
 BepInEx\
 ```
 
-如果只想停用插件但保留加载器，删掉 `BepInEx\plugins\MaydayKick.dll` 就行。
+如果只想停用插件但保留加载器，删掉 `BepInEx\plugins\RoomKit.dll` 就行。
 
 ---
 
@@ -231,13 +233,13 @@ BepInEx\
 
 需要 .NET SDK 6.0 或更高。
 
-当前模组的 C# 源码和项目文件位于 `src/MaydayKick/`；`src/` 下可以按模组名继续添加其它模组目录，每个目录独立构建。
+当前模组的 C# 源码和项目文件位于 `src/RoomKit/`；`src/` 下可以按模组名继续添加其它模组目录，每个目录独立构建。
 
 ```
-dotnet build src\MaydayKick\MaydayKick.csproj -c Release
+dotnet build src\RoomKit\RoomKit.csproj -c Release
 ```
 
-产物在 `src/MaydayKick/bin/Release/MaydayKick.dll`。项目文件里的 `GameDir` 属性指向游戏目录，用来引用 BepInEx 和 IL2CPP 互操作程序集，按自己的路径改一下。
+产物在 `src/RoomKit/bin/Release/RoomKit.dll`。项目文件里的 `GameDir` 属性指向游戏目录，用来引用 BepInEx 和 IL2CPP 互操作程序集，按自己的路径改一下。
 
 ---
 
