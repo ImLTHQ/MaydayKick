@@ -1,0 +1,105 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    版本号唯一来源：当前项目目录的 VERSION 文件。
+    改版本只改那一个文件，csproj / 程序集元数据 / 插件运行时读取的值 / 打包脚本
+    都会跟着变。
+  -->
+  <PropertyGroup>
+    <VersionFile>$(MSBuildThisFileDirectory)VERSION</VersionFile>
+    <Version Condition="Exists('$(VersionFile)')">$([System.IO.File]::ReadAllText('$(VersionFile)').Trim())</Version>
+    <Version Condition="'$(Version)' == ''">0.0.0</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>MaydayUnlock</AssemblyName>
+    <RootNamespace>MaydayUnlock</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <!-- 不随插件复制依赖：BepInEx 运行时已提供 -->
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <DebugType>none</DebugType>
+    <!-- 引用路径由 build.ps1 通过 -p:GameDir=... 传入 -->
+    <GameDir Condition="'$(GameDir)' == ''"></GameDir>
+    <BepInExCore>$(GameDir)\BepInEx\core</BepInExCore>
+    <BepInExInterop>$(GameDir)\BepInEx\interop</BepInExInterop>
+  </PropertyGroup>
+
+  <!--
+    [BepInPlugin] 属性要求编译期常量，所以把 VERSION 的内容生成为一个 const 源码。
+    产物落在 obj/ 下（不进版本库），每次编译按 VERSION 重新生成。
+  -->
+  <Target Name="GenerateVersionSource" BeforeTargets="BeforeCompile;CoreCompile">
+    <PropertyGroup>
+      <VersionSourceFile>$(IntermediateOutputPath)Version.g.cs</VersionSourceFile>
+    </PropertyGroup>
+    <WriteLinesToFile
+      File="$(VersionSourceFile)"
+      Lines="// &lt;auto-generated&gt; 由 MaydayUnlock.csproj 从 VERSION 生成，请勿手工编辑。"
+      Overwrite="true" />
+    <WriteLinesToFile
+      File="$(VersionSourceFile)"
+      Lines="namespace MaydayUnlock%3B%0D%0A%0D%0Ainternal static class BuildInfo%0D%0A{%0D%0A    internal const string Version = &quot;$(Version)&quot;%3B%0D%0A}"
+      Overwrite="false" />
+    <ItemGroup>
+      <Compile Include="$(VersionSourceFile)" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <Reference Include="BepInEx.Core">
+      <HintPath>$(BepInExCore)\BepInEx.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx.Unity.IL2CPP">
+      <HintPath>$(BepInExCore)\BepInEx.Unity.IL2CPP.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(BepInExCore)\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Il2CppInterop.Runtime">
+      <HintPath>$(BepInExCore)\Il2CppInterop.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- UnityEngine 类型（MonoBehaviour 等）来自 interop -->
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(BepInExInterop)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(BepInExInterop)\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- IL2CPP 版的 mscorlib：Hook 参数里出现 Unity 对象时需要 -->
+    <Reference Include="Il2Cppmscorlib">
+      <HintPath>$(BepInExInterop)\Il2Cppmscorlib.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Il2CppSystem">
+      <HintPath>$(BepInExInterop)\Il2CppSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- 游戏 interop 程序集：由 BepInEx 首次运行时生成 -->
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(BepInExInterop)\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Mirror">
+      <HintPath>$(BepInExInterop)\Mirror.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="com.rlabrecque.steamworks.net">
+      <HintPath>$(BepInExInterop)\com.rlabrecque.steamworks.net.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>
