@@ -29,9 +29,11 @@ namespace MaydayUnlock
 
         /// <summary>引擎给 Mirror 预留的槽位上限，见 AllocateSlot 的 cmp ebx,10h。</summary>
         public const int SlotLimit = 16;
+        public const int SteamLobbyMemberLimit = 2000;
 
         internal static ManualLogSource LogSource = null;
         internal static ConfigEntry<int> PlayerLimit = null;
+        internal static ConfigEntry<int> LobbyDisplayLimit = null;
 
         public override void Load()
         {
@@ -42,10 +44,22 @@ namespace MaydayUnlock
                 "PlayerLimit",
                 8,
                 new ConfigDescription(
-                    "联机人数上限（原版固定 4，引擎最多支持 " + SlotLimit + "）",
+                    "房间真实最大允许玩家数量（引擎最多支持 " + SlotLimit + "）",
                     new AcceptableValueRange<int>(1, SlotLimit)));
 
-            LogSource.LogInfo("[MaydayUnlock] 已加载，人数上限 = " + PlayerLimit.Value + "（原版 4，引擎上限 " + SlotLimit + "）");
+            LobbyDisplayLimit = Config.Bind(
+                "General",
+                "LobbyDisplayLimit",
+                0,
+                new ConfigDescription(
+                    "Steam 大厅显示/席位最大玩家数量；0 表示跟随真实人数上限。超过引擎上限 " +
+                    SlotLimit + " 只会放宽大厅席位，不会增加游戏真实人数上限（Steam 最大 " +
+                    SteamLobbyMemberLimit + "）",
+                    new AcceptableValueRange<int>(0, SteamLobbyMemberLimit)));
+
+            LogSource.LogInfo(
+                "[MaydayUnlock] 已加载，真实人数上限 = " + PlayerLimit.Value +
+                "，大厅显示/席位上限 = " + GetLobbyDisplayLimit());
 
             // BepInEx 6 (IL2CPP) 不会自动扫描 Harmony 补丁，必须显式挂载。
             //
@@ -109,10 +123,17 @@ namespace MaydayUnlock
                     LogSource.LogInfo("[MaydayUnlock] maxConnections " + before + " -> " + target);
                 }
             }
+
             catch (Exception e)
             {
                 LogSource.LogError("[MaydayUnlock] 应用失败: " + e);
             }
+        }
+
+        internal static int GetLobbyDisplayLimit()
+        {
+            int configuredLimit = LobbyDisplayLimit == null ? 0 : LobbyDisplayLimit.Value;
+            return configuredLimit == 0 ? PlayerLimit.Value : configuredLimit;
         }
     }
 
@@ -139,8 +160,8 @@ namespace MaydayUnlock
     }
 
     /// <summary>
-    /// 创建 Steam 大厅时把席位数改成配置值。
-    /// 原版是 CreateLobby(type, 4)，第 5 个人会被 Steam 直接挡在门外。
+    /// 创建 Steam 大厅时设置独立于游戏真实人数上限的大厅席位数。
+    /// Steam 大厅可以显示/允许请求加入的席位多于游戏引擎实际能容纳的人数。
     /// </summary>
     [HarmonyPatch]
     internal static class CreateLobbyPatch
@@ -149,11 +170,7 @@ namespace MaydayUnlock
         [HarmonyPatch(typeof(global::Steamworks.SteamMatchmaking), "CreateLobby")]
         private static void Prefix(ref global::Steamworks.ELobbyType eLobbyType, ref int cMaxMembers)
         {
-            int target = Plugin.PlayerLimit.Value;
-            if (target > cMaxMembers)
-            {
-                cMaxMembers = target;
-            }
+            cMaxMembers = Plugin.GetLobbyDisplayLimit();
         }
     }
 
@@ -176,7 +193,7 @@ namespace MaydayUnlock
                     return;
                 }
 
-                int target = Plugin.PlayerLimit.Value;
+                int target = Plugin.GetLobbyDisplayLimit();
                 int before = global::Steamworks.SteamMatchmaking.GetLobbyMemberLimit(lobby);
                 if (before != target)
                 {
@@ -232,4 +249,3 @@ namespace MaydayUnlock
         }
     }
 }
-
