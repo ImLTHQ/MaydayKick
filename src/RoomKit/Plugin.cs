@@ -9,7 +9,7 @@ namespace RoomKit
     [BepInPlugin(Guid, "Mayday Kick", "1.0.0")]
     public class Plugin : BasePlugin
     {
-        public const string Guid = "local.mayday.kick";
+        public const string Guid = "local.mayday.roomkit";
 
         internal static ManualLogSource Logger;
         internal static ConfigEntry<string> RoomName;
