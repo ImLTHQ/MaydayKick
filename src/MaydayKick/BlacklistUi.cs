@@ -15,6 +15,7 @@ namespace MaydayKick
         private static void Postfix(MainMenuScreen __instance)
         {
             BlacklistUi.Attach(__instance);
+            WhitelistUi.Attach(__instance);
         }
     }
 

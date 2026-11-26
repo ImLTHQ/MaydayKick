@@ -37,6 +37,12 @@ namespace MaydayKick
                 if (conn == null || msg == null) return true;
 
                 var steamId = msg.steamId;
+                if (Whitelist.Contains(steamId))
+                {
+                    Plugin.Logger.LogInfo("[MaydayKick] [白名单] 放行 " + msg.name + " - SteamID64 (" + steamId + ")");
+                    return true;
+                }
+
                 if (Plugin.BlockNumericInGameName.Value && IsNumericName(msg.name))
                 {
                     Plugin.Logger.LogInfo("[MaydayKick] [拒绝] - 纯数字游戏昵称 " + msg.name + " - SteamID64 (" + steamId + ")");
@@ -113,6 +119,13 @@ namespace MaydayKick
         private static void CompleteLevelQuery(LevelResultState state)
         {
             var query = state.Query;
+            if (Whitelist.Contains(query.SteamId))
+            {
+                Plugin.Logger.LogInfo("[MaydayKick] [白名单] 保留 " + query.Name +
+                    " - SteamID64 (" + query.SteamId + ")");
+                return;
+            }
+
             var minimumLevel = Math.Max(1, Plugin.SteamLevelMinimum.Value);
             if (!string.IsNullOrEmpty(state.Error))
             {

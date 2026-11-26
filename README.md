@@ -18,6 +18,7 @@
 | --- | --- | --- |
 | 踢出玩家 | 机长菜单「机组」列表每行右侧多一个红色按钮，点了把人踢出本局 | 仅房主 |
 | 踢出并拉黑 | 每行右侧的锁形按钮，踢人同时把对方 SteamID 写进黑名单，之后他再来会被挡在认证阶段 | 仅房主 |
+| 白名单 | 机长菜单可将成员加入/移出白名单；主菜单可查看名单；名单成员跳过黑名单、昵称和 Steam 等级自动踢出规则 | 所有人（管理房主名单文件） |
 | 玩家条件拦截 | 后台检查 Steam 等级是否达到配置下限，并分别检查纯数字 Steam 昵称、纯数字游戏昵称；Steam 等级支持单独记录或踢出 | 仅房主 |
 | 机组列表滚动 | 人数超过一屏时可以滚动查看，不会再有看不到的最后几行 | 所有人 |
 | 显示玩家名 | 「值班中 / 驾驶中 / 出局」后面直接接上玩家名 | 所有人 |
@@ -77,6 +78,23 @@ BepInEx\config\MaydayKick\blacklist.txt
 - 被拉黑的人不需要装这个插件，他连进来的时候会被游戏原生的「你已被移出本局」挡掉
 
 不想手动编辑文件的话，主界面 Discord 按钮下面有个**「黑名单」按钮**，点开就是管理面板：每条显示备注名和 SteamID，右侧「移除」一点就解封，不用重启游戏，也不用去改 txt。条目多了可以在面板里直接滚动。
+
+### 白名单
+
+房主在机长菜单的机组成员行点击勾选按钮即可添加/移除玩家；主菜单 Discord/黑名单按钮附近的**「白名单」**按钮可以查看全部条目并移除。文件路径：
+
+```
+BepInEx\config\MaydayKick\whitelist.txt
+```
+
+每行依次为 SteamID64、Tab、昵称、可选备注（备注前也用 Tab 分隔）：
+
+```
+7656119xxxxxxxxxx	好友昵称	认识多年的队友
+7656119yyyyyyyyyy	常驻玩家
+```
+
+`#` 开头的行是注释，文件修改后会热重载。白名单优先于黑名单，并跳过纯数字昵称和 Steam 等级自动踢出规则；加入白名单时会自动从黑名单移除。白名单成员行不显示拉黑按钮；如需拉黑，先取消白名单，再使用拉黑按钮。房主仍可手动踢出白名单成员。
 
 ### 玩家条件拦截
 
@@ -156,7 +174,7 @@ BepInEx 6.0.0-be.793 - MaydayAirways
 看到 `BepInEx` 字样就说明加载器生效了。再打开 `BepInEx\LogOutput.log`，正常应该有：
 
 ```
-[MaydayKick] loaded v1.0.0 (kick + blacklist + queued Steam checks + player filters + crew scroll + room name)
+[MaydayKick] loaded v1.0.0 (kick + blacklist + whitelist + queued Steam checks + player filters + crew scroll + room name)
 ```
 
 ---

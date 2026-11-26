@@ -77,6 +77,7 @@ namespace MaydayKick
                 "Steam 等级后台查询的最大并发数（1-32，超出范围会限制到范围内）。");
 
             Blacklist.Init();
+            Whitelist.Init();
             Harmony.CreateAndPatchAll(typeof(BlacklistUiPatch), Guid);
             Harmony.CreateAndPatchAll(typeof(RowHookPatch), Guid);
             Harmony.CreateAndPatchAll(typeof(KickPatch), Guid);
@@ -87,7 +88,7 @@ namespace MaydayKick
             Harmony.CreateAndPatchAll(typeof(RoomNameOnLobbyCreatedPatch), Guid);
             Harmony.CreateAndPatchAll(typeof(RoomNameOnSessionPatch), Guid);
             Harmony.CreateAndPatchAll(typeof(RoomNameSyncPatch), Guid);
-            Logger.LogInfo("[MaydayKick] loaded v1.0.0 (kick + blacklist + queued Steam checks + player filters + crew scroll + room name)");
+            Logger.LogInfo("[MaydayKick] loaded v1.0.0 (kick + blacklist + whitelist + queued Steam checks + player filters + crew scroll + room name)");
         }
     }
 }

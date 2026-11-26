@@ -14,6 +14,7 @@ namespace MaydayKick
     {
         private const string KickBtn = "MaydayKickButton";
         private const string BanBtn = "MaydayBanButton";
+        private const string WhitelistBtn = "MaydayWhitelistButton";
 
         private static void Postfix(PauseScreen __instance, PlayerNet p, PauseScreen.CrewRow __result)
         {
@@ -102,7 +103,12 @@ namespace MaydayKick
             }
 
             var tr = row.go.transform;
-            if (tr.Find(BanBtn) != null) return;
+            var existingBanButton = tr.Find(BanBtn);
+            if (existingBanButton != null)
+            {
+                existingBanButton.gameObject.SetActive(!Whitelist.Contains(p.SteamId));
+                return;
+            }
 
             // 关键：行对象会被 RebuildCrew 复用给别的玩家（老玩家走了、新玩家占了这一行），
             // 如果在创建按钮时把 connId/steamId 存进闭包，之后这一行换了人，按钮还是踢原来那个人。
@@ -117,10 +123,17 @@ namespace MaydayKick
             {
                 Kick(targetRow, true);
             }));
+            var whitelistAction = DelegateSupport.ConvertDelegate<Il2CppSystem.Action>(new System.Action(delegate
+            {
+                ToggleWhitelist(targetRow);
+            }));
 
             var hlg = row.go.GetComponent<HorizontalLayoutGroup>();
             AddButton(tr, KickBtn, GlyphId.Exit, ButtonStyle.Danger, kickAction, hlg);
             AddButton(tr, BanBtn, GlyphId.Lock, ButtonStyle.Secondary, banAction, hlg);
+            AddButton(tr, WhitelistBtn, GlyphId.Check, ButtonStyle.Secondary, whitelistAction, hlg);
+            var banButton = tr.Find(BanBtn);
+            if (banButton != null) banButton.gameObject.SetActive(!Whitelist.Contains(p.SteamId));
 
             Plugin.Logger.LogInfo("[MaydayKick] buttons added for row of " + p.DisplayName + " layout=" + (hlg != null));
         }
@@ -144,13 +157,44 @@ namespace MaydayKick
                 var rt = btn.GetComponent<RectTransform>();
                 if (rt != null)
                 {
-                    var offset = name == BanBtn ? 26f : 0f;
+                    var offset = name == WhitelistBtn ? 52f : name == BanBtn ? 26f : 0f;
                     rt.anchorMin = new Vector2(1f, 0.5f);
                     rt.anchorMax = new Vector2(1f, 0.5f);
                     rt.pivot = new Vector2(1f, 0.5f);
                     rt.anchoredPosition = new Vector2(-(2f + offset), 0f);
                     rt.sizeDelta = new Vector2(22f, 22f);
                 }
+            }
+        }
+
+        private static void ToggleWhitelist(PauseScreen.CrewRow row)
+        {
+            try
+            {
+                if (row == null || row.player == null)
+                {
+                    Plugin.Logger.LogWarning("[MaydayKick] whitelist clicked but row/player is null");
+                    return;
+                }
+
+                var p = row.player;
+                if (IsHostSelf(p)) return;
+
+                var steamId = p.SteamId;
+                var name = p.DisplayName;
+                if (Whitelist.Contains(steamId))
+                    Whitelist.Remove(steamId);
+                else
+                    Whitelist.Add(steamId, name);
+
+                var banButton = row.go == null ? null : row.go.transform.Find(BanBtn);
+                if (banButton != null) banButton.gameObject.SetActive(!Whitelist.Contains(steamId));
+
+                WhitelistUi.RefreshIfOpen();
+            }
+            catch (Exception e)
+            {
+                Plugin.Logger.LogError("[MaydayKick] whitelist toggle failed: " + e);
             }
         }
 
@@ -188,6 +232,13 @@ namespace MaydayKick
                 var connId = conn.connectionId;
                 var steamId = p.SteamId;
                 var displayName = p.DisplayName;
+
+                if (ban && Whitelist.Contains(steamId))
+                {
+                    Plugin.Logger.LogWarning("[MaydayKick] refuse to blacklist whitelisted player; remove whitelist first: " +
+                        displayName + " (" + steamId + ")");
+                    return;
+                }
 
                 var local = LocalConnId();
                 if (local >= 0 && connId == local)

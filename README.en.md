@@ -18,6 +18,7 @@ Nothing in the game itself is modified. The mod is a single DLL — delete it an
 | --- | --- | --- |
 | Kick player | A red button appears at the right of each crew row in the captain's menu; clicking it removes that player from the session | Host only |
 | Kick and blacklist | The lock button next to it kicks the player *and* writes their SteamID to the blacklist, so they get blocked during authentication next time | Host only |
+| Whitelist | The host can add/remove crew members from the captain's menu; the list is available from the main menu; listed players bypass blacklist and automatic name/Steam-level kicks | Everyone (manages the host's local file) |
 | Player filters | Independently checks zero Steam level, numeric-only Steam names, and numeric-only in-game names; Steam level can be logged or used to kick separately | Host only |
 | Crew list scrolling | When more than a screenful of players join, the list scrolls instead of cutting off the last rows | Everyone |
 | Player names | The player's name is appended after the "On duty / Flying / Out" status text | Everyone |
@@ -77,6 +78,23 @@ One entry per line: SteamID64, a tab, then a note for yourself:
 - The blocked player does not need this mod installed; they are rejected during authentication with the game's own "you were removed from the session" message
 
 If you would rather not edit the file by hand, use the **Blacklist** button on the main menu (below the Discord button). Every entry shows its note and SteamID, and the Remove button unblocks it immediately.
+
+### Whitelist
+
+As the host, use the check button on a crew row to add or remove that player. The **Whitelist** button near the Discord/Blacklist buttons on the main menu opens the list, where entries can also be removed. The file is:
+
+```
+BepInEx\config\MaydayKick\whitelist.txt
+```
+
+Each line contains the SteamID64, a tab, the player's name, and an optional note preceded by another tab:
+
+```
+7656119xxxxxxxxxx	FriendName	Trusted teammate
+7656119yyyyyyyyyy	Regular player
+```
+
+Lines starting with `#` are comments, and edits are hot-reloaded. The whitelist takes precedence over the blacklist and bypasses automatic numeric-name and Steam-level kicks; adding someone to the whitelist also removes them from the blacklist. Whitelisted crew rows hide the blacklist button. To blacklist them, remove them from the whitelist first. The host can still manually kick a whitelisted player.
 
 ### Player filters
 
@@ -156,7 +174,7 @@ BepInEx 6.0.0-be.793 - MaydayAirways
 If you see `BepInEx` there, the loader is active. Then check `BepInEx\LogOutput.log` for:
 
 ```
-[MaydayKick] loaded v1.0.0 (kick + blacklist + queued Steam checks + player filters + crew scroll + room name)
+[MaydayKick] loaded v1.0.0 (kick + blacklist + whitelist + queued Steam checks + player filters + crew scroll + room name)
 ```
 
 ---

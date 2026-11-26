@@ -92,27 +92,35 @@ namespace MaydayKick
 
         internal static bool Remove(ulong steamId)
         {
-            bool removed;
-            lock (Gate) { removed = Ids.Remove(steamId); }
-            if (!removed) return false;
+            lock (Gate)
+            {
+                if (!Ids.Contains(steamId)) return false;
 
-            try
-            {
-                var lines = new List<string>();
-                foreach (var raw in File.ReadAllLines(FilePath, Encoding.UTF8))
+                try
                 {
-                    var line = raw.Trim();
-                    if (line.Length == 0 || line.StartsWith("#")) { lines.Add(raw); continue; }
-                    var head = line.Split('\t', ' ')[0];
-                    ulong id;
-                    if (ulong.TryParse(head, out id) && id == steamId) continue;
-                    lines.Add(raw);
+                    var lines = new List<string>();
+                    if (File.Exists(FilePath))
+                    {
+                        foreach (var raw in File.ReadAllLines(FilePath, Encoding.UTF8))
+                        {
+                            var line = raw.Trim();
+                            if (line.Length == 0 || line.StartsWith("#")) { lines.Add(raw); continue; }
+                            var head = line.Split('\t', ' ')[0];
+                            ulong id;
+                            if (ulong.TryParse(head, out id) && id == steamId) continue;
+                            lines.Add(raw);
+                        }
+                    }
+
+                    File.WriteAllLines(FilePath, lines, new UTF8Encoding(false));
+                    Ids.Remove(steamId);
+                    lastWrite = DateTime.MinValue;
                 }
-                File.WriteAllLines(FilePath, lines, new UTF8Encoding(false));
-            }
-            catch (Exception e)
-            {
-                Plugin.Logger.LogWarning("[MaydayKick] 重写黑名单失败: " + e.Message);
+                catch (Exception e)
+                {
+                    Plugin.Logger.LogWarning("[MaydayKick] 重写黑名单失败: " + e.Message);
+                    return false;
+                }
             }
 
             Plugin.Logger.LogInfo("[MaydayKick] 已解封 " + steamId + "，共 " + Count + " 条");
