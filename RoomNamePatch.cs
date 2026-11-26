@@ -11,6 +11,10 @@ namespace MaydayKick
     internal static class RoomName
     {
         private const string MinimumLevelSuffixPrefix = " | 下限Steam公开Lv";
+        private const float LobbyDataLogInterval = 30f;
+        private static string lastLobbyDataLog;
+        private static ulong lastLobbyDataLobbyId;
+        private static float lastLobbyDataLogAt;
 
         public static void TryApply(SteamLobbyService steam)
         {
@@ -25,33 +29,56 @@ namespace MaydayKick
 
                 var key = SteamLobbyService.KeyName;
                 var current = SteamMatchmaking.GetLobbyData(lobby, key);
-                Plugin.Logger.LogInfo($"[MaydayKick] lobby data: {SteamLobbyService.KeyGame}='{SteamMatchmaking.GetLobbyData(lobby, SteamLobbyService.KeyGame)}' {SteamLobbyService.KeyVersion}='{SteamMatchmaking.GetLobbyData(lobby, SteamLobbyService.KeyVersion)}' {SteamLobbyService.KeyHost}='{SteamMatchmaking.GetLobbyData(lobby, SteamLobbyService.KeyHost)}' {key}='{current}'");
-
                 var configuredName = Plugin.RoomName.Value;
                 var wanted = string.IsNullOrWhiteSpace(configuredName) ? current : configuredName;
                 wanted = RemoveGeneratedSuffix(wanted);
-                if (string.IsNullOrWhiteSpace(wanted)) return;
-
-                wanted = wanted.Replace("{host}", SafePersona());
-                var suffix = MinimumLevelSuffixPrefix + Math.Max(1, Plugin.SteamLevelMinimum.Value);
-                var maxBaseLength = 63 - suffix.Length;
-                if (wanted.Length > maxBaseLength)
+                if (!string.IsNullOrWhiteSpace(wanted))
                 {
-                    if (maxBaseLength > 0 && char.IsHighSurrogate(wanted[maxBaseLength - 1]) &&
-                        char.IsLowSurrogate(wanted[maxBaseLength]))
-                        maxBaseLength--;
+                    wanted = wanted.Replace("{host}", SafePersona());
+                    var suffix = MinimumLevelSuffixPrefix + Math.Max(1, Plugin.SteamLevelMinimum.Value);
+                    var maxBaseLength = 63 - suffix.Length;
+                    if (wanted.Length > maxBaseLength)
+                    {
+                        if (maxBaseLength > 0 && char.IsHighSurrogate(wanted[maxBaseLength - 1]) &&
+                            char.IsLowSurrogate(wanted[maxBaseLength]))
+                            maxBaseLength--;
 
-                    wanted = wanted.Substring(0, maxBaseLength);
+                        wanted = wanted.Substring(0, maxBaseLength);
+                    }
+                    wanted += suffix;
+
+                    if (wanted != current)
+                    {
+                        var ok = SteamMatchmaking.SetLobbyData(lobby, key, wanted);
+                        Plugin.Logger.LogInfo($"[MaydayKick] room name -> '{wanted}' ok={ok}");
+                    }
                 }
-                wanted += suffix;
-                if (wanted == current) return;
 
-                var ok = SteamMatchmaking.SetLobbyData(lobby, key, wanted);
-                Plugin.Logger.LogInfo($"[MaydayKick] room name -> '{wanted}' ok={ok}");
+                LogLobbyDataIfNeeded(lobby, key);
             }
             catch (Exception e)
             {
                 Plugin.Logger.LogWarning("[MaydayKick] room name failed: " + e.Message);
+            }
+        }
+
+        private static void LogLobbyDataIfNeeded(CSteamID lobby, string nameKey)
+        {
+            var game = SteamMatchmaking.GetLobbyData(lobby, SteamLobbyService.KeyGame);
+            var version = SteamMatchmaking.GetLobbyData(lobby, SteamLobbyService.KeyVersion);
+            var host = SteamMatchmaking.GetLobbyData(lobby, SteamLobbyService.KeyHost);
+            var name = SteamMatchmaking.GetLobbyData(lobby, nameKey);
+            var message = $"[MaydayKick] lobby data: {SteamLobbyService.KeyGame}='{game}' {SteamLobbyService.KeyVersion}='{version}' {SteamLobbyService.KeyHost}='{host}' {nameKey}='{name}'";
+            var now = Time.realtimeSinceStartup;
+
+            if (lobby.m_SteamID != lastLobbyDataLobbyId ||
+                message != lastLobbyDataLog ||
+                now - lastLobbyDataLogAt >= LobbyDataLogInterval)
+            {
+                Plugin.Logger.LogInfo(message);
+                lastLobbyDataLobbyId = lobby.m_SteamID;
+                lastLobbyDataLog = message;
+                lastLobbyDataLogAt = now;
             }
         }
 
