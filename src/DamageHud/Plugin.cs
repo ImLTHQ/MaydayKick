@@ -510,7 +510,7 @@ public sealed class Plugin : BasePlugin
         _rowTexts.Clear();
 
         _panel = UIF.Panel(hudRoot, "DamageHudPanel", UITheme.HudPanel, UITheme.Radius, shadow: true, raycast: false);
-        UIF.At(_panel.Root, UIF.BottomLeft, new Vector2(0f, 0f), new Vector2(20f, 30f), new Vector2(320f, 100f));
+        UIF.At(_panel.Root, UIF.BottomRight, new Vector2(1f, 0f), new Vector2(-20f, 20f), new Vector2(320f, 100f));
 
         UIF.VLayout(
             _panel.Root.gameObject,
