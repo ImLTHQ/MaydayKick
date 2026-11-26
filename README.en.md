@@ -198,11 +198,13 @@ To keep the loader but disable only this mod, delete `BepInEx\plugins\MaydayKick
 
 Requires .NET SDK 6.0 or newer.
 
+The C# source and project file for this mod live in `src/MaydayKick/`. Additional mods can use their own named directories under `src/` and build independently.
+
 ```
-dotnet build MaydayKick.csproj -c Release
+dotnet build src\MaydayKick\MaydayKick.csproj -c Release
 ```
 
-The output lands in `bin/Release/MaydayKick.dll`. The `GameDir` property in the csproj points at your game folder and is used to reference BepInEx and the IL2CPP interop assemblies — adjust it to your own path.
+The output lands in `src/MaydayKick/bin/Release/MaydayKick.dll`. The `GameDir` property in the project file points at your game folder and is used to reference BepInEx and the IL2CPP interop assemblies — adjust it to your own path.
 
 ---
 

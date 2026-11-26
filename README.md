@@ -213,11 +213,13 @@ BepInEx\
 
 需要 .NET SDK 6.0 或更高。
 
+当前模组的 C# 源码和项目文件位于 `src/MaydayKick/`；`src/` 下可以按模组名继续添加其它模组目录，每个目录独立构建。
+
 ```
-dotnet build MaydayKick.csproj -c Release
+dotnet build src\MaydayKick\MaydayKick.csproj -c Release
 ```
 
-产物在 `bin/Release/MaydayKick.dll`。csproj 里的 `GameDir` 属性指向游戏目录，用来引用 BepInEx 和 IL2CPP 互操作程序集，按自己的路径改一下。
+产物在 `src/MaydayKick/bin/Release/MaydayKick.dll`。项目文件里的 `GameDir` 属性指向游戏目录，用来引用 BepInEx 和 IL2CPP 互操作程序集，按自己的路径改一下。
 
 ---
 
